@@ -57,7 +57,7 @@ class Quote extends Model
 
     public function isDelivered(): bool
     {
-        return $this->delivered_at !== null;
+        return $this->deliverables()->count() > 0;
     }
 
     public function hasAmount(): bool
