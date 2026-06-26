@@ -23,10 +23,20 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button id="notif-bell" class="relative text-slate-500 hover:text-slate-300 transition-colors" title="Notifiche">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                        <span id="notif-badge" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center hidden" style="font-size:9px">0</span>
-                    </button>
+                    <div class="relative">
+                        <button id="notif-bell" class="relative text-slate-500 hover:text-slate-300 transition-colors" title="Notifiche">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                            <span id="notif-badge" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center hidden" style="font-size:9px">0</span>
+                        </button>
+                        <div id="notif-dropdown" class="absolute right-0 top-full mt-2 w-80 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl shadow-black/50 hidden z-50 overflow-hidden">
+                            <div class="p-3 border-b border-slate-800">
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Notifiche</p>
+                            </div>
+                            <div id="notif-list" class="max-h-64 overflow-y-auto">
+                                <p class="text-sm text-slate-500 text-center py-6" id="notif-empty">Nessuna notifica.</p>
+                            </div>
+                        </div>
+                    </div>
                     <span class="text-sm text-slate-500 hidden sm:inline">{{ auth()->user()->name }}</span>
                     <a href="{{ route('home') }}" class="text-sm text-slate-500 hover:text-slate-300 transition-colors" target="_blank">Sito</a>
                     <form method="POST" action="{{ route('logout') }}" class="inline">
@@ -50,6 +60,8 @@
     </main>
 
     <script>
+    var prevTotal = 0;
+
     function showToast(message, type) {
         var container = document.getElementById('toast-container');
         var colors = type === 'error' ? 'bg-red-900/80 border-red-700 text-red-200' : (type === 'info' ? 'bg-sky-900/80 border-sky-700 text-sky-200' : 'bg-emerald-900/80 border-emerald-700 text-emerald-200');
@@ -64,6 +76,23 @@
         navigator.sendBeacon('{{ route('api.ping') }}', '');
     }
 
+    function renderNotifications(data) {
+        var list = document.getElementById('notif-list');
+        if (data.total === 0) {
+            list.innerHTML = '<p class="text-sm text-slate-500 text-center py-6">Nessuna notifica.</p>';
+            return;
+        }
+        var html = '';
+        data.items.forEach(function(item) {
+            var dot = item.type === 'staff_reply' ? 'bg-sky-500' : 'bg-amber-500';
+            html += '<a href="' + item.url + '" class="flex items-start gap-3 px-4 py-3 hover:bg-slate-800/50 transition-colors border-b border-slate-800/50 last:border-0">';
+            html += '<span class="w-2 h-2 rounded-full ' + dot + ' mt-1.5 shrink-0"></span>';
+            html += '<div class="min-w-0"><p class="text-sm text-slate-200">' + item.text + '</p><p class="text-xs text-slate-500 mt-0.5">' + item.time + '</p></div>';
+            html += '</a>';
+        });
+        list.innerHTML = html;
+    }
+
     function checkNotifications() {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '{{ route('api.user.notifications') }}', true);
@@ -74,18 +103,36 @@
                 if (data.total > 0) {
                     badge.textContent = data.total;
                     badge.classList.remove('hidden');
+                    if (data.total > prevTotal && prevTotal > 0) {
+                        var first = data.items[0];
+                        showToast(first.text, 'info');
+                    }
                 } else {
                     badge.classList.add('hidden');
                 }
+                prevTotal = data.total;
             }
         };
         xhr.send();
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('notif-bell').addEventListener('click', function() {
-            showToast('Controlla le tue richieste per nuovi messaggi o aggiornamenti.', 'info');
+        var bell = document.getElementById('notif-bell');
+        var dropdown = document.getElementById('notif-dropdown');
+        bell.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var isOpen = !dropdown.classList.contains('hidden');
+            dropdown.classList.toggle('hidden');
+            if (!isOpen) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '{{ route('api.user.notifications') }}', true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) { renderNotifications(JSON.parse(xhr.responseText)); }
+                };
+                xhr.send();
+            }
         });
+        document.addEventListener('click', function() { dropdown.classList.add('hidden'); });
         pingActivity();
         checkNotifications();
         setInterval(pingActivity, 120000);
