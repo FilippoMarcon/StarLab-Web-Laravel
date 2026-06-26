@@ -1,0 +1,86 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+:root {
+    --bg-primary: #fcfbf8;
+    --bg-secondary: #ffffff;
+    --bg-card: rgba(255, 255, 255, 0.7);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --border-color: rgba(148, 163, 184, 0.2);
+    --border-card: rgba(148, 163, 184, 0.3);
+}
+
+.dark {
+    --bg-primary: #09090b;
+    --bg-secondary: #171717;
+    --bg-card: rgba(23, 23, 23, 0.8);
+    --text-primary: #f4f4f5;
+    --text-secondary: #a1a1aa;
+    --text-muted: #71717a;
+    --border-color: rgba(63, 63, 70, 0.4);
+    --border-card: rgba(63, 63, 70, 0.3);
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+@layer components {
+    .glass-card {
+        @apply bg-white/70 backdrop-blur-xl border border-slate-200/60 shadow-[0_8px_32px_rgba(0,0,0,0.04)];
+    }
+
+    .dark .glass-card {
+        @apply bg-zinc-900/80 border-zinc-800/60 shadow-[0_8px_32px_rgba(0,0,0,0.3)];
+    }
+
+    .glass {
+        @apply bg-white/40 backdrop-blur-md border border-slate-200/40;
+    }
+
+    .dark .glass {
+        @apply bg-zinc-900/40 border-zinc-800/40;
+    }
+}
+
+@keyframes reveal {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-reveal {
+    animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slow-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-slow-spin {
+    animation: slow-spin 20s linear infinite;
+}
+
+@keyframes loading-bar {
+    from { width: 0; }
+    to { width: 100%; }
+}
