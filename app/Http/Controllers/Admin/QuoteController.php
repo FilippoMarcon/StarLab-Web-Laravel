@@ -54,7 +54,9 @@ class QuoteController extends Controller
 
         foreach ($request->file('files') as $file) {
             $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
-            $originalPath = $file->storeAs('quotes/' . $quote->id . '/deliverables', $filename, 'cloudinary');
+            $originalPath = 'quotes/' . $quote->id . '/deliverables/' . $filename;
+
+            Storage::disk('cloudinary')->put($originalPath, file_get_contents($file->getRealPath()));
 
             $watermarkedPath = null;
             if (str_starts_with($file->getMimeType(), 'image/')) {

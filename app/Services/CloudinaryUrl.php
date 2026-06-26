@@ -13,7 +13,8 @@ class CloudinaryUrl
     private static function instance(): Cloudinary
     {
         if (!self::$cloudinary) {
-            self::$cloudinary = new Cloudinary(config('cloudinary') ?: []);
+            $url = config('cloudinary.cloud_url');
+            self::$cloudinary = new Cloudinary($url ?: []);
         }
         return self::$cloudinary;
     }
