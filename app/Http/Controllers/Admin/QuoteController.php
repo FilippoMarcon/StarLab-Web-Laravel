@@ -81,7 +81,7 @@ class QuoteController extends Controller
                     }
                 }
 
-                \Log::info('Creating deliverable: original=' . $originalPath . ' wm=' . ($watermarkedPath ?? 'null') . ' name=' . $file->getClientOriginalName());
+                \Log::warning('Creating deliverable: original=' . $originalPath . ' wm=' . ($watermarkedPath ?? 'null') . ' name=' . $file->getClientOriginalName());
 
                 QuoteDeliverable::create([
                     'quote_id' => $quote->id,
