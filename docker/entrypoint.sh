@@ -21,5 +21,8 @@ fi
 
 php /var/www/artisan migrate --force 2>/dev/null
 php /var/www/artisan storage:link 2>/dev/null
+php /var/www/artisan config:cache 2>/dev/null
+php /var/www/artisan route:cache 2>/dev/null
+php /var/www/artisan view:cache 2>/dev/null
 
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
