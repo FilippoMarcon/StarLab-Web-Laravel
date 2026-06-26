@@ -271,6 +271,14 @@
                     </button>
                 </form>
                 @endif
+                @if ($quote->isPaid())
+                <form method="POST" action="{{ route('admin.quotes.reset-payment-simulation', $quote) }}" onsubmit="return confirm('Rimuovere la simulazione del saldo?')">
+                    @csrf
+                    <button type="submit" class="px-4 py-2 bg-red-600/50 hover:bg-red-500 text-white font-bold rounded-lg text-sm transition-all whitespace-nowrap">
+                        Annulla Simulazione Saldo
+                    </button>
+                </form>
+                @endif
             </div>
         </div>
     </div>

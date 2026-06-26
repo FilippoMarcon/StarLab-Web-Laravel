@@ -173,6 +173,16 @@ class QuoteController extends Controller
             ->with('success', 'Acconto del 50% simulato con successo (nessun addebito reale).');
     }
 
+    public function resetPaymentSimulation(Quote $quote)
+    {
+        $quote->update([
+            'paid_at' => null,
+            'paypal_txn_id' => null,
+        ]);
+        return redirect()->route('admin.quotes.show', $quote)
+            ->with('success', 'Simulazione saldo rimossa. Il preventivo è tornato allo stato "saldo da pagare".');
+    }
+
     public function simulateFinal(Quote $quote)
     {
         $quote->update([

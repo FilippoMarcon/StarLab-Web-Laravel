@@ -79,6 +79,7 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::delete('/quotes/{quote}', [AdminQuoteController::class, 'destroy'])->name('quotes.destroy');
     Route::post('/quotes/{quote}/simulate-deposit', [AdminQuoteController::class, 'simulateDeposit'])->name('quotes.simulate-deposit');
     Route::post('/quotes/{quote}/simulate-final', [AdminQuoteController::class, 'simulateFinal'])->name('quotes.simulate-final');
+    Route::post('/quotes/{quote}/reset-payment-simulation', [AdminQuoteController::class, 'resetPaymentSimulation'])->name('quotes.reset-payment-simulation');
     Route::get('/quotes/{quote}/chat', [ChatController::class, 'messages'])->name('chat.messages');
     Route::post('/quotes/{quote}/chat', [ChatController::class, 'send'])->name('chat.send');
 });
