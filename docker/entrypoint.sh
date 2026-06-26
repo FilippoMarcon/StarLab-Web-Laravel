@@ -5,6 +5,10 @@ PORT=${PORT:-80}
 sed -i "s/listen 80;/listen ${PORT};/g" /etc/nginx/http.d/default.conf
 sed -i "s/listen \[::\]:80;/listen [::]:${PORT};/g" /etc/nginx/http.d/default.conf
 
+touch /var/www/storage/logs/laravel.log
+chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+
 if [ ! -f /var/www/.env ]; then
     cp /var/www/.env.example /var/www/.env
 fi
