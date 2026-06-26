@@ -1,8 +1,10 @@
 FROM php:8.3-fpm-alpine
 
-RUN apk add --no-cache nginx supervisor curl libpng-dev libjpeg-turbo-dev freetype-dev libxml2-dev zip libzip-dev openssl-dev postgresql-dev sqlite-dev \
+RUN apk add --no-cache nginx supervisor curl ca-certificates openssl libpng-dev libjpeg-turbo-dev freetype-dev libxml2-dev zip libzip-dev openssl-dev postgresql-dev sqlite-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql pdo_pgsql pdo_sqlite gd zip bcmath
+
+ENV PGSSLMODE=require
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
