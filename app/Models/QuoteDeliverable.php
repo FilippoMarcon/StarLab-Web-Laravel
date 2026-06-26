@@ -16,12 +16,12 @@ class QuoteDeliverable extends Model
 
     public function getUrlWatermarkedAttribute()
     {
-        return $this->path_watermarked ? Storage::url($this->path_watermarked) : null;
+        return $this->path_watermarked ? Storage::disk('cloudinary')->url($this->path_watermarked) : null;
     }
 
     public function getUrlOriginalAttribute()
     {
-        return Storage::url($this->path_original);
+        return Storage::disk('cloudinary')->url($this->path_original);
     }
 
     public function isImage()

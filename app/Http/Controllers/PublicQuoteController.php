@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Storage;
 
 class PublicQuoteController extends Controller
 {
+    private string $disk = 'cloudinary';
+
     public function show($token)
     {
         $quote = Quote::where('token', $token)->with('attachments', 'deliverables')->firstOrFail();
@@ -19,7 +21,7 @@ class PublicQuoteController extends Controller
     {
         $quote = Quote::where('token', $token)->firstOrFail();
         if ($attachment->quote_id !== $quote->id) abort(404);
-        return Storage::disk('public')->download($attachment->path, $attachment->original_name);
+        return redirect(Storage::disk($this->disk)->url($attachment->path));
     }
 
     public function downloadDeliverable($token, QuoteDeliverable $deliverable)
@@ -28,11 +30,11 @@ class PublicQuoteController extends Controller
         if ($deliverable->quote_id !== $quote->id) abort(404);
 
         if ($quote->isPaid()) {
-            return Storage::disk('public')->download($deliverable->path_original, $deliverable->original_name);
+            return redirect(Storage::disk($this->disk)->url($deliverable->path_original));
         }
 
         if ($deliverable->path_watermarked) {
-            return Storage::disk('public')->download($deliverable->path_watermarked, $deliverable->original_name);
+            return redirect(Storage::disk($this->disk)->url($deliverable->path_watermarked));
         }
 
         return back()->with('error', 'Nessuna anteprima disponibile.');

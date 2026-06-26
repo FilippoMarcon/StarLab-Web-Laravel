@@ -16,7 +16,7 @@ class QuoteAttachment extends Model
 
     public function getUrlAttribute()
     {
-        return Storage::url($this->path);
+        return Storage::disk('cloudinary')->url($this->path);
     }
 
     public function getSizeForHumansAttribute()

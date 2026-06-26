@@ -47,7 +47,7 @@ class QuoteController extends Controller
                 try {
                     if (!$file || !$file->isValid()) continue;
                     $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
-                    $path = $file->storeAs('quotes/' . $quote->id, $filename, 'public');
+                    $path = $file->storeAs('quotes/' . $quote->id, $filename, 'cloudinary');
                     if ($path) {
                         QuoteAttachment::create([
                             'quote_id' => $quote->id,
@@ -80,7 +80,7 @@ class QuoteController extends Controller
     {
         if ($quote->user_id !== auth()->id()) abort(403);
         if ($attachment->quote_id !== $quote->id) abort(404);
-        return Storage::disk('public')->download($attachment->path, $attachment->original_name);
+        return redirect(Storage::disk('cloudinary')->url($attachment->path));
     }
 
     public function downloadDeliverable(Quote $quote, QuoteDeliverable $deliverable)
@@ -89,11 +89,11 @@ class QuoteController extends Controller
         if ($deliverable->quote_id !== $quote->id) abort(404);
 
         if ($quote->isPaid()) {
-            return Storage::disk('public')->download($deliverable->path_original, $deliverable->original_name);
+            return redirect(Storage::disk('cloudinary')->url($deliverable->path_original));
         }
 
         if ($deliverable->path_watermarked) {
-            return Storage::disk('public')->download($deliverable->path_watermarked, $deliverable->original_name);
+            return redirect(Storage::disk('cloudinary')->url($deliverable->path_watermarked));
         }
 
         return back()->with('error', 'Nessuna anteprima disponibile.');

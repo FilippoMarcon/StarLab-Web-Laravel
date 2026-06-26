@@ -36,7 +36,7 @@ class QuoteController extends Controller
                 try {
                     if (!$file || !$file->isValid()) continue;
                     $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
-                    $path = $file->storeAs('quotes/' . $quote->id, $filename, 'public');
+                    $path = $file->storeAs('quotes/' . $quote->id, $filename, 'cloudinary');
                     if ($path) {
                         QuoteAttachment::create([
                             'quote_id' => $quote->id,

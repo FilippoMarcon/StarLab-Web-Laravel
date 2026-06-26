@@ -12,6 +12,8 @@ use Illuminate\Support\Str;
 
 class QuoteController extends Controller
 {
+    private string $disk = 'cloudinary';
+
     public function index()
     {
         $quotes = Quote::with('user')->latest()->get();
@@ -51,20 +53,19 @@ class QuoteController extends Controller
             'files.*' => 'required|file|max:102400',
         ]);
 
-        $logoPath = public_path('images/StarLab-Logo.png');
-
         foreach ($request->file('files') as $file) {
             $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
-            $originalPath = $file->storeAs('quotes/' . $quote->id . '/deliverables', $filename, 'public');
+            $originalPath = $file->storeAs('quotes/' . $quote->id . '/deliverables', $filename, $this->disk);
 
             $watermarkedPath = null;
             if (str_starts_with($file->getMimeType(), 'image/')) {
                 $watermarkedPath = 'quotes/' . $quote->id . '/deliverables/wm_' . $filename;
-                $this->applyLogoWatermark(
-                    Storage::disk('public')->path($originalPath),
-                    Storage::disk('public')->path($watermarkedPath),
-                    $logoPath
-                );
+                $tmpFile = tempnam(sys_get_temp_dir(), 'wm_');
+                $this->applyLogoWatermark($file->getRealPath(), $tmpFile);
+                if (file_exists($tmpFile)) {
+                    Storage::disk($this->disk)->put($watermarkedPath, file_get_contents($tmpFile));
+                    unlink($tmpFile);
+                }
             }
 
             QuoteDeliverable::create([
@@ -85,15 +86,14 @@ class QuoteController extends Controller
     {
         if ($deliverable->quote_id !== $quote->id) abort(404);
 
-        // If not paid, only allow watermarked download
         if (!$quote->isPaid()) {
             if ($deliverable->path_watermarked) {
-                return Storage::disk('public')->download($deliverable->path_watermarked, $deliverable->original_name);
+                return redirect(Storage::disk($this->disk)->url($deliverable->path_watermarked));
             }
             return back()->with('error', 'Nessuna anteprima disponibile.');
         }
 
-        return Storage::disk('public')->download($deliverable->path_original, $deliverable->original_name);
+        return redirect(Storage::disk($this->disk)->url($deliverable->path_original));
     }
 
     public function downloadAttachment(Quote $quote, QuoteAttachment $attachment)
@@ -101,21 +101,22 @@ class QuoteController extends Controller
         if ($attachment->quote_id !== $quote->id) {
             abort(404);
         }
-        return Storage::disk('public')->download($attachment->path, $attachment->original_name);
+        return redirect(Storage::disk($this->disk)->url($attachment->path));
     }
 
     public function destroyDeliverable(Quote $quote, QuoteDeliverable $deliverable)
     {
         if ($deliverable->quote_id !== $quote->id) abort(404);
 
-        Storage::disk('public')->delete([$deliverable->path_original, $deliverable->path_watermarked]);
+        Storage::disk($this->disk)->delete([$deliverable->path_original, $deliverable->path_watermarked]);
         $deliverable->delete();
 
         return redirect()->route('admin.quotes.show', $quote)->with('success', 'Grafica eliminata.');
     }
 
-    private function applyLogoWatermark($sourcePath, $destPath, $logoPath)
+    private function applyLogoWatermark($sourcePath, $destPath)
     {
+        $logoPath = public_path('images/StarLab-Logo.png');
         if (!file_exists($logoPath)) return;
 
         $info = getimagesize($sourcePath);
@@ -156,11 +157,6 @@ class QuoteController extends Controller
 
         imagecopymerge($srcImg, $watermarked, 0, 0, 0, 0, $width, $height, 30);
         imagedestroy($watermarked);
-
-        $destDir = dirname($destPath);
-        if (!is_dir($destDir)) {
-            mkdir($destDir, 0755, true);
-        }
 
         switch ($mime) {
             case 'image/jpeg': imagejpeg($srcImg, $destPath, 90); break;
