@@ -3,9 +3,49 @@
 @section('title', 'StarLab Admin | Preventivi')
 
 @section('content')
-<div class="mb-8">
-    <h1 class="text-3xl font-black text-white uppercase tracking-tight">Preventivi</h1>
-    <p class="text-slate-400 text-sm mt-1">Richieste ricevute dal form contatti</p>
+<div class="mb-8 flex items-end justify-between">
+    <div>
+        <h1 class="text-3xl font-black text-white uppercase tracking-tight">Preventivi</h1>
+        <p class="text-slate-400 text-sm mt-1">
+            @if ($currentFilter === 'pending')
+                In attesa di contatto
+            @elseif ($currentFilter === 'contacted')
+                Contattati, in attesa acconto
+            @elseif ($currentFilter === 'deposit')
+                Acconto ricevuto, in lavorazione
+            @elseif ($currentFilter === 'paid')
+                Saldati e completati
+            @else
+                Tutte le richieste
+            @endif
+        </p>
+    </div>
+    <a href="{{ route('admin.dashboard') }}" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-sm transition-all">
+        &larr; Dashboard
+    </a>
+</div>
+
+<div class="flex flex-wrap gap-2 mb-6">
+    <a href="{{ route('admin.quotes.index') }}"
+       class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all {{ !$currentFilter ? 'bg-amber-500 text-white' : 'bg-slate-800 text-slate-400 hover:text-white' }}">
+        Tutti
+    </a>
+    <a href="{{ route('admin.quotes.index', ['status' => 'pending']) }}"
+       class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all {{ $currentFilter === 'pending' ? 'bg-amber-500 text-white' : 'bg-slate-800 text-slate-400 hover:text-white' }}">
+        In Attesa
+    </a>
+    <a href="{{ route('admin.quotes.index', ['status' => 'contacted']) }}"
+       class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all {{ $currentFilter === 'contacted' ? 'bg-amber-500 text-white' : 'bg-slate-800 text-slate-400 hover:text-white' }}">
+        Contattati
+    </a>
+    <a href="{{ route('admin.quotes.index', ['payment' => 'deposit']) }}"
+       class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all {{ $currentFilter === 'deposit' ? 'bg-amber-500 text-white' : 'bg-slate-800 text-slate-400 hover:text-white' }}">
+        Acconti Ricevuti
+    </a>
+    <a href="{{ route('admin.quotes.index', ['payment' => 'paid']) }}"
+       class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all {{ $currentFilter === 'paid' ? 'bg-amber-500 text-white' : 'bg-slate-800 text-slate-400 hover:text-white' }}">
+        Saldati
+    </a>
 </div>
 
 <div class="bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden">
@@ -15,6 +55,7 @@
                 <th class="text-left p-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Data</th>
                 <th class="text-left p-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Nome</th>
                 <th class="text-left p-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Servizio</th>
+                <th class="text-left p-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Pagamento</th>
                 <th class="text-left p-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Stato</th>
                 <th class="text-left p-4 text-xs font-bold text-slate-400 uppercase tracking-wider"></th>
             </tr>
@@ -25,6 +66,15 @@
                     <td class="p-4 text-sm text-slate-300">{{ $quote->created_at->format('d/m/Y H:i') }}</td>
                     <td class="p-4 text-sm text-white font-bold">{{ $quote->name }}</td>
                     <td class="p-4 text-sm text-slate-300">{{ $quote->service_type }}</td>
+                    <td class="p-4">
+                        @if ($quote->isPaid())
+                            <span class="text-emerald-400 font-bold text-xs">Salda&shy;to</span>
+                        @elseif ($quote->hasPaidDeposit())
+                            <span class="text-amber-400 font-bold text-xs">Acconto</span>
+                        @else
+                            <span class="text-slate-600 text-xs">—</span>
+                        @endif
+                    </td>
                     <td class="p-4">
                         <span class="px-2 py-1 text-xs font-bold rounded-full
                             @if($quote->status === 'pending') bg-amber-900/30 text-amber-400
@@ -50,9 +100,9 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="p-12 text-center text-slate-500">
+                    <td colspan="6" class="p-12 text-center text-slate-500">
                         <p class="text-lg font-bold">Nessun preventivo</p>
-                        <p class="text-sm mt-1">I preventivi richiesti dal sito appariranno qui.</p>
+                        <p class="text-sm mt-1">Nessuna richiesta corrisponde al filtro selezionato.</p>
                     </td>
                 </tr>
             @endforelse

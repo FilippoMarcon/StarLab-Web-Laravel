@@ -13,10 +13,24 @@ use Illuminate\Support\Str;
 
 class QuoteController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $quotes = Quote::with('user')->latest()->get();
-        return view('admin.quotes.index', compact('quotes'));
+        $query = Quote::with('user')->latest();
+
+        if ($request->status === 'pending') {
+            $query->where('status', 'pending');
+        } elseif ($request->status === 'contacted') {
+            $query->where('status', 'contacted');
+        } elseif ($request->payment === 'deposit') {
+            $query->whereNotNull('deposit_paid_at')->whereNull('paid_at');
+        } elseif ($request->payment === 'paid') {
+            $query->whereNotNull('paid_at');
+        }
+
+        $quotes = $query->get();
+        $currentFilter = $request->status ?? $request->payment ?? null;
+
+        return view('admin.quotes.index', compact('quotes', 'currentFilter'));
     }
 
     public function show(Quote $quote)
