@@ -59,9 +59,14 @@ class QuoteController extends Controller
                             'size' => $file->getSize(),
                         ]);
                     }
-                } catch (\Exception $e) {
-                    \Log::error('Quote file upload error: ' . $e->getMessage());
-                    return back()->withInput()->withErrors(['files' => 'Errore caricamento file. Riprova o contattaci.']);
+                } catch (\Throwable $e) {
+                    \Log::error('Quote (user) file upload error: ' . $e->getMessage(), [
+                        'file' => $file->getClientOriginalName(),
+                        'size' => $file->getSize(),
+                        'mime' => $file->getMimeType(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+                    return back()->withInput()->withErrors(['files' => 'Errore caricamento file: ' . $e->getMessage()]);
                 }
             }
         }
