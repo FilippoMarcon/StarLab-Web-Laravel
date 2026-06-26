@@ -87,7 +87,7 @@
     @endif
 
     <div class="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl">
-        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Preventivo Economico</h3>
+        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Prezzo e Pagamenti</h3>
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-xs text-slate-500">Prezzo Totale</p>
