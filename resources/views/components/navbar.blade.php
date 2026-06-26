@@ -52,24 +52,24 @@
     </div>
   </nav>
 
-<div id="mobile-menu" class="hidden lg:hidden fixed inset-x-0 z-40 p-6 flex flex-col gap-4 shadow-xl transition-all duration-300 dark:bg-zinc-900/95 dark:border dark:border-zinc-800 bg-white/95 backdrop-blur-xl border border-slate-200" style="margin-left: 1rem; margin-right: 1rem; border-radius: 1rem;">
+<div id="mobile-menu" class="hidden lg:hidden fixed inset-x-0 z-40 p-6 flex flex-col gap-3 shadow-xl transition-all duration-300 dark:bg-zinc-900/95 dark:border dark:border-zinc-800 bg-white/95 backdrop-blur-xl border border-slate-200 max-h-[calc(100vh-100px)] overflow-y-auto" style="margin-left: 1rem; margin-right: 1rem; border-radius: 1rem;">
   @foreach ([['label' => 'Home', 'href' => route('home')], ['label' => 'Pricing', 'href' => route('pricing')], ['label' => 'Contatti', 'href' => route('contact')], ['label' => 'Portfolio', 'href' => route('portfolio')], ['label' => 'News', 'href' => route('news')]] as $item)
-    <a href="{{ $item['href'] }}" class="mobile-nav-item text-left text-lg font-medium py-3 border-b cursor-pointer dark:text-zinc-400 dark:border-zinc-800 text-slate-500 border-slate-100">{{ $item['label'] }}</a>
+    <a href="{{ $item['href'] }}" class="mobile-nav-item text-left text-base font-medium py-2.5 border-b cursor-pointer dark:text-zinc-400 dark:border-zinc-800 text-slate-500 border-slate-100">{{ $item['label'] }}</a>
   @endforeach
-  <div class="grid grid-cols-2 gap-4 py-4 mt-2">
-    <a href="{{ route('starweb') }}" class="p-4 rounded-xl text-center text-sm font-bold cursor-pointer dark:bg-zinc-800 dark:border dark:border-zinc-700 dark:text-blue-400 bg-slate-50 border border-blue-200 text-blue-600">StarWeb</a>
-    <a href="{{ route('stargraphics') }}" class="p-4 rounded-xl text-center text-sm font-bold cursor-pointer dark:bg-zinc-800 dark:border dark:border-zinc-700 dark:text-pink-400 bg-slate-50 border border-pink-200 text-pink-600">StarGraphics</a>
+  <div class="grid grid-cols-2 gap-3 py-3">
+    <a href="{{ route('starweb') }}" class="p-3 rounded-xl text-center text-xs font-bold cursor-pointer dark:bg-zinc-800 dark:border dark:border-zinc-700 dark:text-blue-400 bg-slate-50 border border-blue-200 text-blue-600">StarWeb</a>
+    <a href="{{ route('stargraphics') }}" class="p-3 rounded-xl text-center text-xs font-bold cursor-pointer dark:bg-zinc-800 dark:border dark:border-zinc-700 dark:text-pink-400 bg-slate-50 border border-pink-200 text-pink-600">StarGraphics</a>
   </div>
-  <a href="{{ route('company') }}" class="mt-2 text-center py-4 rounded-xl font-semibold text-lg border cursor-pointer dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-700 bg-slate-100 text-slate-900 border-slate-200">Company</a>
+  <a href="{{ route('company') }}" class="text-center py-3 rounded-xl font-semibold text-base border cursor-pointer dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-700 bg-slate-100 text-slate-900 border-slate-200">Company</a>
   @auth
-    <a href="{{ route('user.dashboard') }}" class="text-center py-4 rounded-xl font-semibold text-lg cursor-pointer dark:bg-amber-500 dark:text-white bg-amber-500 text-white">Dashboard</a>
+    <a href="{{ route('user.dashboard') }}" class="text-center py-3 rounded-xl font-semibold text-base cursor-pointer dark:bg-amber-500 dark:text-white bg-amber-500 text-white">Dashboard</a>
     <form method="POST" action="{{ route('logout') }}">
       @csrf
-      <button type="submit" class="w-full text-center py-4 rounded-xl font-semibold text-lg border cursor-pointer dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700 bg-slate-100 text-slate-600 border-slate-200">Esci</button>
+      <button type="submit" class="w-full text-center py-3 rounded-xl font-semibold text-base border cursor-pointer dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700 bg-slate-100 text-slate-600 border-slate-200">Esci</button>
     </form>
   @else
-    <a href="{{ route('login') }}" class="text-center py-4 rounded-xl font-semibold text-lg border cursor-pointer dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-700 bg-slate-100 text-slate-900 border-slate-200">Accedi</a>
-    <a href="{{ route('register') }}" class="text-center py-4 rounded-xl font-semibold text-lg cursor-pointer dark:bg-amber-500 dark:text-white bg-amber-500 text-white">Registrati</a>
+    <a href="{{ route('login') }}" class="text-center py-3 rounded-xl font-semibold text-base border cursor-pointer dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-700 bg-slate-100 text-slate-900 border-slate-200">Accedi</a>
+    <a href="{{ route('register') }}" class="text-center py-3 rounded-xl font-semibold text-base cursor-pointer dark:bg-amber-500 dark:text-white bg-amber-500 text-white">Registrati</a>
   @endauth
 </div>
 
