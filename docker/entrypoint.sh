@@ -13,4 +13,7 @@ if [ -z "$APP_KEY" ]; then
     php /var/www/artisan key:generate --force
 fi
 
+php /var/www/artisan migrate --force 2>/dev/null
+php /var/www/artisan storage:link 2>/dev/null
+
 exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
