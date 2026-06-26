@@ -179,7 +179,11 @@
             @csrf
             <div class="flex items-end gap-3">
                 <div class="flex-1">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Prezzo (&euro;)</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Prezzo (&euro;)
+                        @if ($quote->service_price)
+                            <span class="text-amber-400 font-bold">(da listino: €{{ number_format($quote->service_price, 2) }})</span>
+                        @endif
+                    </label>
                     <input type="number" name="amount" step="0.01" min="0" value="{{ old('amount', $quote->amount) }}"
                         class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-amber-500 outline-none transition-all" placeholder="0.00">
                 </div>
