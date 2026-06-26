@@ -52,39 +52,54 @@ class QuoteController extends Controller
             'files.*' => 'required|file|max:102400',
         ]);
 
+        $uploaded = 0;
         foreach ($request->file('files') as $file) {
-            $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
-            $originalPath = $file->storeAs('quotes/' . $quote->id . '/deliverables', $filename, 'cloudinary');
+            try {
+                $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
+                $originalPath = $file->storeAs('quotes/' . $quote->id . '/deliverables', $filename, 'cloudinary');
 
-            $watermarkedPath = null;
-            if (str_starts_with($file->getMimeType(), 'image/')) {
-                $watermarkedPath = 'quotes/' . $quote->id . '/deliverables/wm_' . $filename;
-                $tmpFile = tempnam(sys_get_temp_dir(), 'wm_');
-                $this->applyLogoWatermark($file->getRealPath(), $tmpFile);
-                if (file_exists($tmpFile)) {
-                    $handle = fopen($tmpFile, 'rb');
-                    Storage::disk('cloudinary')->put($watermarkedPath, $handle);
-                    fclose($handle);
-                    unlink($tmpFile);
+                if (!$originalPath) {
+                    \Log::error('Upload deliverable: Cloudinary storeAs failed', ['name' => $file->getClientOriginalName()]);
+                    continue;
                 }
-            }
 
-            QuoteDeliverable::create([
-                'quote_id' => $quote->id,
-                'filename' => $filename,
-                'original_name' => $file->getClientOriginalName(),
-                'path_original' => $originalPath,
-                'path_watermarked' => $watermarkedPath,
-                'mime_type' => $file->getMimeType(),
-                'size' => $file->getSize(),
-            ]);
+                $watermarkedPath = null;
+                if (str_starts_with($file->getMimeType(), 'image/')) {
+                    $watermarkedPath = 'quotes/' . $quote->id . '/deliverables/wm_' . $filename;
+                    $tmpFile = tempnam(sys_get_temp_dir(), 'wm_');
+                    $this->applyLogoWatermark($file->getRealPath(), $tmpFile);
+                    if (file_exists($tmpFile)) {
+                        $handle = fopen($tmpFile, 'rb');
+                        Storage::disk('cloudinary')->put($watermarkedPath, $handle);
+                        fclose($handle);
+                        unlink($tmpFile);
+                    }
+                }
+
+                QuoteDeliverable::create([
+                    'quote_id' => $quote->id,
+                    'filename' => $filename,
+                    'original_name' => $file->getClientOriginalName(),
+                    'path_original' => $originalPath,
+                    'path_watermarked' => $watermarkedPath,
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                ]);
+                $uploaded++;
+            } catch (\Throwable $e) {
+                \Log::error('Upload deliverable error: ' . $e->getMessage(), [
+                    'file' => $file->getClientOriginalName(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+                return back()->withErrors(['files' => 'Errore caricamento ' . $file->getClientOriginalName() . ': ' . $e->getMessage()]);
+            }
         }
 
-        if (!$quote->isDelivered()) {
+        if (!$quote->isDelivered() && $uploaded > 0) {
             $quote->update(['delivered_at' => now()]);
         }
 
-        return redirect()->route('admin.quotes.show', $quote)->with('success', 'Grafiche caricate con successo.');
+        return redirect()->route('admin.quotes.show', $quote)->with('success', "$uploaded grafica/e caricata/e con successo.");
     }
 
     public function downloadDeliverable(Quote $quote, QuoteDeliverable $deliverable)
