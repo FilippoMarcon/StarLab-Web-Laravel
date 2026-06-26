@@ -9,8 +9,6 @@
           <a href="{{ route('pricing') }}" class="text-sm font-bold transition-colors cursor-pointer text-left dark:text-blue-400 text-blue-600 hover:text-blue-500">Vedi Listino Prezzi &rarr;</a>
           <span class="text-sm font-bold transition-colors cursor-pointer text-left flex items-center gap-1.5 dark:text-yellow-400 text-yellow-600 hover:text-yellow-500" onclick="document.getElementById('ai-chat-toggle')?.click()">Parla con Nova AI &#x1F916;</span>
         </div>
-        <div class="flex gap-4">
-        </div>
       </div>
 
       <div>
