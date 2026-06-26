@@ -15,6 +15,15 @@ class ChatController extends Controller
 
         $after = $request->integer('after', 0);
 
+        $user = Auth::user();
+        $isStaff = $user->role === 'staff' || $user->role === 'admin';
+
+        if ($isStaff) {
+            $quote->update(['staff_last_viewed_at' => now()]);
+        } else {
+            $quote->update(['client_last_viewed_at' => now()]);
+        }
+
         return $quote->messages()
             ->with('user')
             ->when($after, fn($q) => $q->where('id', '>', $after))

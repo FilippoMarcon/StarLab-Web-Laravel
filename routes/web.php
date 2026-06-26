@@ -94,49 +94,47 @@ Route::middleware('auth')->post('/api/ping', function () {
 })->name('api.ping');
 
 Route::middleware('user')->get('/api/user/notifications', function () {
-    $userQuotes = \App\Models\Quote::where('user_id', auth()->id())->pluck('id');
-    $lastMsgSub = \Illuminate\Support\Facades\DB::table('quote_messages')
-        ->selectRaw('MAX(id) as max_id')->groupBy('quote_id');
-    $newReplyIds = \Illuminate\Support\Facades\DB::table('quote_messages')
-        ->joinSub($lastMsgSub, 'latest', fn($j) => $j->on('quote_messages.id', '=', 'latest.max_id'))
-        ->where('quote_messages.is_staff', true)
-        ->whereIn('quote_messages.quote_id', $userQuotes)
-        ->pluck('quote_messages.quote_id')->toArray();
+    $Quote = \App\Models\Quote::class;
+    $userQuotes = $Quote::where('user_id', auth()->id())->with(['messages' => fn($q) => $q->where('is_staff', true)->latest()->take(1)])->get(['id','service_type','client_last_viewed_at','staff_notes_updated_at']);
     $items = [];
-    $repliedQuotes = \App\Models\Quote::whereIn('id', $newReplyIds)->get();
-    foreach ($repliedQuotes as $q) {
-        $lastMsg = $q->messages()->where('is_staff', true)->latest()->first();
-        $items[] = ['type' => 'staff_reply', 'text' => "Staff ha risposto a \"{$q->service_type}\"", 'url' => route('user.quotes.show', $q), 'time' => $lastMsg?->created_at?->diffForHumans() ?? 'ora'];
-    }
-    $updatedQuotes = \App\Models\Quote::whereIn('id', $userQuotes)->where('updated_at', '>=', now()->subDay())->whereNotNull('staff_notes_updated_at')->get();
-    foreach ($updatedQuotes as $q) {
-        $already = false;
-        foreach ($items as $item) { if (str_contains($item['url'], (string)$q->id)) { $already = true; break; } }
-        if (!$already) {
-            $items[] = ['type' => 'update', 'text' => "Il preventivo \"{$q->service_type}\" è stato aggiornato", 'url' => route('user.quotes.show', $q), 'time' => $q->staff_notes_updated_at?->diffForHumans() ?? 'oggi'];
+
+    foreach ($userQuotes as $q) {
+        $lastStaffMsg = $q->messages->first();
+        if ($lastStaffMsg && (!$q->client_last_viewed_at || $lastStaffMsg->created_at > $q->client_last_viewed_at)) {
+            $items[] = ['type' => 'staff_reply', 'text' => "Staff ha risposto a \"{$q->service_type}\"", 'url' => route('user.quotes.show', $q), 'time' => $lastStaffMsg->created_at->diffForHumans()];
+        }
+        if ($q->staff_notes_updated_at && (!$q->client_last_viewed_at || $q->staff_notes_updated_at > $q->client_last_viewed_at)) {
+            $items[] = ['type' => 'update', 'text' => "Il preventivo \"{$q->service_type}\" è stato aggiornato", 'url' => route('user.quotes.show', $q), 'time' => $q->staff_notes_updated_at->diffForHumans()];
         }
     }
-    usort($items, fn($a, $b) => strtotime($b['time'] ?? 'now') - strtotime($a['time'] ?? 'now'));
-    return response()->json(['total' => count($items), 'items' => array_slice($items, 0, 10)]);
+
+    return response()->json(['total' => count($items), 'items' => $items]);
 })->name('api.user.notifications');
 
 Route::middleware('admin')->get('/api/admin/notifications', function () {
-    $quoteModel = \App\Models\Quote::class;
+    $Quote = \App\Models\Quote::class;
     $items = [];
-    $newQuotes = $quoteModel::where('created_at', '>=', now()->subDay())->latest()->take(5)->get();
-    foreach ($newQuotes as $q) {
-        $items[] = ['type' => 'new_quote', 'text' => "Nuovo preventivo da {$q->name}", 'url' => route('admin.quotes.show', $q), 'time' => $q->created_at->diffForHumans()];
+
+    $quotes = $Quote::where('created_at', '>=', now()->subWeek())->latest()->get();
+    $quoteIds = $quotes->pluck('id');
+    $lastClientMsgs = \Illuminate\Support\Facades\DB::table('quote_messages')
+        ->whereIn('quote_id', $quoteIds)
+        ->where('is_staff', false)
+        ->selectRaw('quote_id, MAX(created_at) as last_msg_at')
+        ->groupBy('quote_id')
+        ->pluck('last_msg_at', 'quote_id');
+
+    foreach ($quotes as $q) {
+        $isNew = !$q->staff_last_viewed_at || $q->created_at > $q->staff_last_viewed_at;
+        if ($isNew) {
+            $items[] = ['type' => 'new_quote', 'text' => "Nuovo preventivo da {$q->name}", 'url' => route('admin.quotes.show', $q), 'time' => $q->created_at->diffForHumans()];
+        }
+        $lastMsgAt = $lastClientMsgs[$q->id] ?? null;
+        if ($lastMsgAt && (!$q->staff_last_viewed_at || $lastMsgAt > $q->staff_last_viewed_at)) {
+            $items[] = ['type' => 'pending_reply', 'text' => "{$q->name} ha scritto un messaggio", 'url' => route('admin.quotes.show', $q), 'time' => \Illuminate\Support\Carbon::parse($lastMsgAt)->diffForHumans()];
+        }
     }
-    $lastMsgSub = \Illuminate\Support\Facades\DB::table('quote_messages')
-        ->selectRaw('MAX(id) as max_id')->groupBy('quote_id');
-    $pendingMsgIds = \Illuminate\Support\Facades\DB::table('quote_messages')
-        ->joinSub($lastMsgSub, 'latest', fn($j) => $j->on('quote_messages.id', '=', 'latest.max_id'))
-        ->where('quote_messages.is_staff', false)
-        ->pluck('quote_messages.quote_id')->toArray();
-    $pendingQuotes = $quoteModel::whereIn('id', $pendingMsgIds)->get();
-    foreach ($pendingQuotes as $q) {
-        $items[] = ['type' => 'pending_reply', 'text' => "{$q->name} ha scritto un messaggio", 'url' => route('admin.quotes.show', $q), 'time' => $q->messages()->latest()->first()?->created_at?->diffForHumans() ?? 'ora'];
-    }
+
     usort($items, fn($a, $b) => strtotime($b['time'] ?? 'now') - strtotime($a['time'] ?? 'now'));
     return response()->json(['total' => count($items), 'items' => array_slice($items, 0, 10)]);
 })->name('api.admin.notifications');

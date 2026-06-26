@@ -23,11 +23,23 @@ class DashboardController extends Controller
             ->selectRaw('MAX(id) as max_id')
             ->groupBy('quote_id');
 
-        $newReplyIds = DB::table('quote_messages')
+        $staffReplies = DB::table('quote_messages')
             ->joinSub($lastMessageSub, 'latest', fn($j) => $j->on('quote_messages.id', '=', 'latest.max_id'))
             ->where('quote_messages.is_staff', true)
-            ->pluck('quote_messages.quote_id')
-            ->toArray();
+            ->select('quote_messages.quote_id', 'quote_messages.created_at as last_reply_at')
+            ->get()
+            ->keyBy('quote_id');
+
+        $newReplyIds = [];
+        $quotes->each(function ($q) use ($staffReplies, &$newReplyIds) {
+            $row = $staffReplies[$q->id] ?? null;
+            if ($row) {
+                $lastReplyAt = $row->last_reply_at;
+                if (!$q->client_last_viewed_at || $lastReplyAt > $q->client_last_viewed_at) {
+                    $newReplyIds[] = $q->id;
+                }
+            }
+        });
 
         return view('user.dashboard', compact(
             'quotes', 'totalQuotes', 'pendingQuotes', 'completedQuotes', 'newReplyIds'

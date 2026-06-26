@@ -12,6 +12,7 @@ class Quote extends Model
         'status', 'token', 'staff_notes', 'staff_notes_updated_at',
         'amount', 'paid_at', 'paypal_txn_id',
         'deposit_paid_at', 'deposit_paypal_txn_id', 'delivered_at',
+        'client_last_viewed_at', 'staff_last_viewed_at',
     ];
 
     protected function casts(): array

@@ -33,14 +33,25 @@ class DashboardController extends Controller
             ->selectRaw('MAX(id) as max_id')
             ->groupBy('quote_id');
 
-        $pendingReplyIds = DB::table('quote_messages')
+        $pendingReplyRows = DB::table('quote_messages')
             ->joinSub($lastMessageSub, 'latest', fn($j) => $j->on('quote_messages.id', '=', 'latest.max_id'))
             ->where('quote_messages.is_staff', false)
-            ->pluck('quote_messages.quote_id')
-            ->toArray();
+            ->select('quote_messages.quote_id', 'quote_messages.created_at as last_msg_at')
+            ->get()
+            ->keyBy('quote_id');
 
-        $pendingReplyCount = count($pendingReplyIds);
-        $pendingReplyQuotes = Quote::whereIn('id', $pendingReplyIds)->with('user')->get();
+        $pendingReplyIds = [];
+        $pendingReplyQuotes = Quote::whereIn('id', $pendingReplyRows->keys())->with('user')->get();
+        $filtered = [];
+        foreach ($pendingReplyQuotes as $q) {
+            $lastMsgAt = $pendingReplyRows[$q->id]->last_msg_at ?? null;
+            if ($lastMsgAt && (!$q->staff_last_viewed_at || $lastMsgAt > $q->staff_last_viewed_at)) {
+                $filtered[] = $q;
+                $pendingReplyIds[] = $q->id;
+            }
+        }
+        $pendingReplyCount = count($filtered);
+        $pendingReplyQuotes = collect($filtered);
 
         $monthlyChart = [];
         for ($i = 11; $i >= 0; $i--) {
