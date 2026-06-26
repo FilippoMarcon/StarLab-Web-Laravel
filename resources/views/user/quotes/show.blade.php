@@ -150,7 +150,7 @@
             @foreach ($quote->deliverables as $deliverable)
                 <div class="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden">
                     @if ($deliverable->isImage())
-                        <img src="{{ $deliverable->url_watermarked ?? $deliverable->url_original }}" alt="{{ $deliverable->original_name }}" class="w-full h-28 object-cover cursor-pointer" onclick="openPreview('{{ $deliverable->url_watermarked ?? $deliverable->url_original }}', '{{ $deliverable->original_name }}')">
+                        <img src="{{ $quote->isPaid() ? $deliverable->url_original : ($deliverable->url_watermarked ?? $deliverable->url_original) }}" alt="{{ $deliverable->original_name }}" class="w-full h-28 object-cover cursor-pointer" onclick="openPreview('{{ $quote->isPaid() ? $deliverable->url_original : ($deliverable->url_watermarked ?? $deliverable->url_original) }}', '{{ $deliverable->original_name }}')">
                     @else
                         <div class="w-full h-28 flex items-center justify-center bg-slate-800">
                             <svg class="w-10 h-10 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
@@ -163,7 +163,7 @@
                         </div>
                         <div class="flex items-center gap-1 shrink-0">
                             @if ($deliverable->isImage())
-                            <button onclick="openPreview('{{ $deliverable->url_watermarked ?? $deliverable->url_original }}', '{{ $deliverable->original_name }}')" class="p-1.5 bg-sky-500/20 hover:bg-sky-500/40 text-sky-400 rounded-lg transition-all" title="Anteprima">
+                            <button onclick="openPreview('{{ $quote->isPaid() ? $deliverable->url_original : ($deliverable->url_watermarked ?? $deliverable->url_original) }}', '{{ $deliverable->original_name }}')" class="p-1.5 bg-sky-500/20 hover:bg-sky-500/40 text-sky-400 rounded-lg transition-all" title="Anteprima">
                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                             </button>
                             @endif
