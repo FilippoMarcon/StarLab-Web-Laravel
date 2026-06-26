@@ -95,20 +95,28 @@ Route::middleware('auth')->post('/api/ping', function () {
 
 Route::middleware('user')->get('/api/user/notifications', function () {
     $Quote = \App\Models\Quote::class;
-    $userQuotes = $Quote::where('user_id', auth()->id())->with(['messages' => fn($q) => $q->where('is_staff', true)->latest()->take(1)])->get(['id','service_type','client_last_viewed_at','staff_notes_updated_at']);
+    $userQuotes = $Quote::where('user_id', auth()->id())->get(['id','service_type','client_last_viewed_at','staff_notes_updated_at']);
+    $quoteIds = $userQuotes->pluck('id');
+    $lastStaffReplies = \Illuminate\Support\Facades\DB::table('quote_messages')
+        ->whereIn('quote_id', $quoteIds)
+        ->where('is_staff', true)
+        ->selectRaw('quote_id, MAX(created_at) as last_reply_at')
+        ->groupBy('quote_id')
+        ->pluck('last_reply_at', 'quote_id');
     $items = [];
 
     foreach ($userQuotes as $q) {
-        $lastStaffMsg = $q->messages->first();
-        if ($lastStaffMsg && (!$q->client_last_viewed_at || $lastStaffMsg->created_at > $q->client_last_viewed_at)) {
-            $items[] = ['type' => 'staff_reply', 'text' => "Staff ha risposto a \"{$q->service_type}\"", 'url' => route('user.quotes.show', $q), 'time' => $lastStaffMsg->created_at->diffForHumans()];
+        $lastReplyAt = $lastStaffReplies[$q->id] ?? null;
+        if ($lastReplyAt && (!$q->client_last_viewed_at || \Illuminate\Support\Carbon::parse($lastReplyAt) > $q->client_last_viewed_at)) {
+            $items[] = ['type' => 'staff_reply', 'text' => "Staff ha risposto a \"{$q->service_type}\"", 'url' => route('user.quotes.show', $q), 'time' => \Illuminate\Support\Carbon::parse($lastReplyAt)->diffForHumans()];
         }
         if ($q->staff_notes_updated_at && (!$q->client_last_viewed_at || $q->staff_notes_updated_at > $q->client_last_viewed_at)) {
             $items[] = ['type' => 'update', 'text' => "Il preventivo \"{$q->service_type}\" è stato aggiornato", 'url' => route('user.quotes.show', $q), 'time' => $q->staff_notes_updated_at->diffForHumans()];
         }
     }
 
-    return response()->json(['total' => count($items), 'items' => $items]);
+    usort($items, fn($a, $b) => strtotime($b['time'] ?? 'now') - strtotime($a['time'] ?? 'now'));
+    return response()->json(['total' => count($items), 'items' => array_slice($items, 0, 10)]);
 })->name('api.user.notifications');
 
 Route::middleware('admin')->get('/api/admin/notifications', function () {
