@@ -48,6 +48,8 @@ class QuoteController extends Controller
 
     public function uploadDeliverable(Request $request, Quote $quote)
     {
+        error_log('UPLOAD_DELIVERABLE: reached controller for quote ' . $quote->id);
+
         $request->validate([
             'files.*' => 'required|file|max:102400',
         ]);
@@ -81,7 +83,7 @@ class QuoteController extends Controller
                     }
                 }
 
-                \Log::warning('Creating deliverable: original=' . $originalPath . ' wm=' . ($watermarkedPath ?? 'null') . ' name=' . $file->getClientOriginalName());
+                error_log('Creating deliverable: original=' . $originalPath . ' wm=' . ($watermarkedPath ?? 'null') . ' name=' . $file->getClientOriginalName());
 
                 QuoteDeliverable::create([
                     'quote_id' => $quote->id,
