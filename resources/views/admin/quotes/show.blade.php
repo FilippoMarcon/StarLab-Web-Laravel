@@ -159,6 +159,12 @@
         <form method="POST" action="{{ route('admin.quotes.deliverables.upload', $quote) }}" enctype="multipart/form-data" class="pt-3 border-t border-slate-800">
             @csrf
             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Carica Nuove Grafiche</label>
+            @error('files')
+                <p class="text-red-400 text-sm mb-2">{{ $message }}</p>
+            @enderror
+            @error('files.*')
+                <p class="text-red-400 text-sm mb-2">{{ $message }}</p>
+            @enderror
             <div class="flex items-center gap-3">
                 <input type="file" name="files[]" multiple required
                     class="flex-1 px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-amber-500 file:text-white file:font-bold file:text-sm hover:file:bg-amber-400 file:cursor-pointer file:transition-all">

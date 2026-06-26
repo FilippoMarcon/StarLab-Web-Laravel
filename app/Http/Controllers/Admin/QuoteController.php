@@ -65,14 +65,19 @@ class QuoteController extends Controller
 
                 $watermarkedPath = null;
                 if (str_starts_with($file->getMimeType(), 'image/')) {
-                    $watermarkedPath = 'quotes/' . $quote->id . '/deliverables/wm_' . $filename;
-                    $tmpFile = tempnam(sys_get_temp_dir(), 'wm_');
-                    $this->applyLogoWatermark($file->getRealPath(), $tmpFile);
-                    if (file_exists($tmpFile)) {
-                        $handle = fopen($tmpFile, 'rb');
-                        Storage::disk('cloudinary')->put($watermarkedPath, $handle);
-                        fclose($handle);
-                        unlink($tmpFile);
+                    try {
+                        $watermarkedPath = 'quotes/' . $quote->id . '/deliverables/wm_' . $filename;
+                        $tmpFile = tempnam(sys_get_temp_dir(), 'wm_');
+                        $this->applyLogoWatermark($file->getRealPath(), $tmpFile);
+                        if (file_exists($tmpFile)) {
+                            $handle = fopen($tmpFile, 'rb');
+                            Storage::disk('cloudinary')->put($watermarkedPath, $handle);
+                            fclose($handle);
+                            unlink($tmpFile);
+                        }
+                    } catch (\Throwable $we) {
+                        \Log::warning('Watermark failed, original uploaded anyway: ' . $we->getMessage());
+                        $watermarkedPath = null;
                     }
                 }
 
