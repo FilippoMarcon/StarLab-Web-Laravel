@@ -2,7 +2,9 @@ FROM php:8.3-fpm-alpine
 
 RUN apk add --no-cache nginx supervisor curl ca-certificates openssl libpng-dev libjpeg-turbo-dev freetype-dev libxml2-dev zip libzip-dev openssl-dev postgresql-dev sqlite-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql pdo_sqlite gd zip bcmath
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql pdo_sqlite gd zip bcmath \
+    && echo "upload_max_filesize = 100M" > /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "post_max_size = 105M" >> /usr/local/etc/php/conf.d/uploads.ini
 
 ENV PGSSLMODE=require
 

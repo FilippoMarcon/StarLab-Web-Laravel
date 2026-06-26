@@ -8,6 +8,7 @@ use App\Models\QuoteAttachment;
 use App\Models\QuoteDeliverable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Services\CloudinaryUrl;
 use Illuminate\Support\Facades\Storage;
 
 class QuoteController extends Controller
@@ -80,7 +81,7 @@ class QuoteController extends Controller
     {
         if ($quote->user_id !== auth()->id()) abort(403);
         if ($attachment->quote_id !== $quote->id) abort(404);
-        return redirect(Storage::disk('cloudinary')->url($attachment->path));
+        return redirect(CloudinaryUrl::get($attachment->path));
     }
 
     public function downloadDeliverable(Quote $quote, QuoteDeliverable $deliverable)
@@ -89,11 +90,11 @@ class QuoteController extends Controller
         if ($deliverable->quote_id !== $quote->id) abort(404);
 
         if ($quote->isPaid()) {
-            return redirect(Storage::disk('cloudinary')->url($deliverable->path_original));
+            return redirect(CloudinaryUrl::get($deliverable->path_original));
         }
 
         if ($deliverable->path_watermarked) {
-            return redirect(Storage::disk('cloudinary')->url($deliverable->path_watermarked));
+            return redirect(CloudinaryUrl::get($deliverable->path_watermarked));
         }
 
         return back()->with('error', 'Nessuna anteprima disponibile.');

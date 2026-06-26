@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class QuoteAttachment extends Model
 {
@@ -16,7 +15,7 @@ class QuoteAttachment extends Model
 
     public function getUrlAttribute()
     {
-        return Storage::disk('cloudinary')->url($this->path);
+        return \App\Services\CloudinaryUrl::get($this->path);
     }
 
     public function getSizeForHumansAttribute()

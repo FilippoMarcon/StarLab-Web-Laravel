@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class QuoteDeliverable extends Model
 {
@@ -16,12 +15,12 @@ class QuoteDeliverable extends Model
 
     public function getUrlWatermarkedAttribute()
     {
-        return $this->path_watermarked ? Storage::disk('cloudinary')->url($this->path_watermarked) : null;
+        return $this->path_watermarked ? \App\Services\CloudinaryUrl::get($this->path_watermarked) : null;
     }
 
     public function getUrlOriginalAttribute()
     {
-        return Storage::disk('cloudinary')->url($this->path_original);
+        return \App\Services\CloudinaryUrl::get($this->path_original);
     }
 
     public function isImage()

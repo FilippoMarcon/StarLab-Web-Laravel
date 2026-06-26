@@ -7,13 +7,12 @@ use App\Models\Quote;
 use App\Models\QuoteAttachment;
 use App\Models\QuoteDeliverable;
 use Illuminate\Http\Request;
+use App\Services\CloudinaryUrl;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class QuoteController extends Controller
 {
-    private string $disk = 'cloudinary';
-
     public function index()
     {
         $quotes = Quote::with('user')->latest()->get();
@@ -55,7 +54,7 @@ class QuoteController extends Controller
 
         foreach ($request->file('files') as $file) {
             $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
-            $originalPath = $file->storeAs('quotes/' . $quote->id . '/deliverables', $filename, $this->disk);
+            $originalPath = $file->storeAs('quotes/' . $quote->id . '/deliverables', $filename, 'cloudinary');
 
             $watermarkedPath = null;
             if (str_starts_with($file->getMimeType(), 'image/')) {
@@ -63,7 +62,7 @@ class QuoteController extends Controller
                 $tmpFile = tempnam(sys_get_temp_dir(), 'wm_');
                 $this->applyLogoWatermark($file->getRealPath(), $tmpFile);
                 if (file_exists($tmpFile)) {
-                    Storage::disk($this->disk)->put($watermarkedPath, file_get_contents($tmpFile));
+                    Storage::disk('cloudinary')->put($watermarkedPath, file_get_contents($tmpFile));
                     unlink($tmpFile);
                 }
             }
@@ -88,12 +87,12 @@ class QuoteController extends Controller
 
         if (!$quote->isPaid()) {
             if ($deliverable->path_watermarked) {
-                return redirect(Storage::disk($this->disk)->url($deliverable->path_watermarked));
+                return redirect(CloudinaryUrl::get($deliverable->path_watermarked));
             }
             return back()->with('error', 'Nessuna anteprima disponibile.');
         }
 
-        return redirect(Storage::disk($this->disk)->url($deliverable->path_original));
+        return redirect(CloudinaryUrl::get($deliverable->path_original));
     }
 
     public function downloadAttachment(Quote $quote, QuoteAttachment $attachment)
@@ -101,7 +100,7 @@ class QuoteController extends Controller
         if ($attachment->quote_id !== $quote->id) {
             abort(404);
         }
-        return redirect(Storage::disk($this->disk)->url($attachment->path));
+        return redirect(CloudinaryUrl::get($attachment->path));
     }
 
     public function destroyDeliverable(Quote $quote, QuoteDeliverable $deliverable)
