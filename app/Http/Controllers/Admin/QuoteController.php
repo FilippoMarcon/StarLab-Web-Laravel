@@ -65,6 +65,8 @@ class QuoteController extends Controller
                     continue;
                 }
 
+                error_log('Deliverable file debug: mime=' . $file->getMimeType() . ' ext=' . $file->getClientOriginalExtension() . ' realpath=' . ($file->getRealPath() ?: 'NULL'));
+
                 $watermarkedPath = null;
                 if (str_starts_with($file->getMimeType(), 'image/')) {
                     $watermarkedPath = 'quotes/' . $quote->id . '/deliverables/wm_' . $filename;
@@ -164,15 +166,19 @@ class QuoteController extends Controller
 
     private function applyLogoWatermark($sourcePath, $destPath)
     {
+        error_log('applyLogoWatermark called: source=' . $sourcePath . ' dest=' . $destPath);
+
         $logoPath = public_path('images/StarLab-Logo.png');
         if (!file_exists($logoPath)) {
-            \Log::error('Watermark: logo not found at ' . $logoPath);
+            error_log('Watermark: logo not found at ' . $logoPath);
             return;
         }
 
+        error_log('Watermark: logo found, source exists=' . (file_exists($sourcePath) ? 'yes' : 'no') . ' size=' . (file_exists($sourcePath) ? filesize($sourcePath) : 'N/A'));
+
         $info = @getimagesize($sourcePath);
         if (!$info) {
-            \Log::error('Watermark: getimagesize failed for ' . $sourcePath);
+            error_log('Watermark: getimagesize failed for ' . $sourcePath);
             return;
         }
 
@@ -186,18 +192,18 @@ class QuoteController extends Controller
             case 'image/gif': $srcImg = @imagecreatefromgif($sourcePath); break;
             case 'image/webp': $srcImg = @imagecreatefromwebp($sourcePath); break;
             default:
-                \Log::error('Watermark: unsupported mime ' . $mime);
+                error_log('Watermark: unsupported mime ' . $mime);
                 return;
         }
 
         if (!$srcImg) {
-            \Log::error('Watermark: imagecreate failed for ' . $sourcePath);
+            error_log('Watermark: imagecreate failed for ' . $sourcePath);
             return;
         }
 
         $logoImg = @imagecreatefrompng($logoPath);
         if (!$logoImg) {
-            \Log::error('Watermark: logo imagecreate failed');
+            error_log('Watermark: logo imagecreate failed');
             return;
         }
 
