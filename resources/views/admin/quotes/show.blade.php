@@ -30,7 +30,7 @@
                 <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Servizio</p>
                 <p class="text-white">{{ $quote->service_type }}
                     @if ($quote->service_price)
-                        <span class="ml-2 text-xs text-amber-400 font-bold">(da listino: €{{ number_format($quote->service_price, 2) }})</span>
+                        <span class="ml-2 text-xs text-amber-400 font-bold">(listino standard: €{{ number_format($quote->service_price, 2) }})</span>
                     @endif
                 </p>
             </div>
@@ -181,7 +181,7 @@
                 <div class="flex-1">
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Prezzo (&euro;)
                         @if ($quote->service_price)
-                            <span class="text-amber-400 font-bold">(da listino: €{{ number_format($quote->service_price, 2) }})</span>
+                            <span class="text-amber-400 font-bold">(listino standard: €{{ number_format($quote->service_price, 2) }})</span>
                         @endif
                     </label>
                     <input type="number" name="amount" step="0.01" min="0" value="{{ old('amount', $quote->amount) }}"

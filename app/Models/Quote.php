@@ -55,12 +55,12 @@ class Quote extends Model
     public static function servicePrices(): array
     {
         return [
-            'Logo Design' => 199,
-            'Thumbnail & Social' => 79,
-            'Banner' => 99,
-            'Grafica Avanzata' => 299,
-            'Sviluppo Web' => 599,
-            'Bundle / Pack' => 299,
+            'Thumbnail & Social' => 10,
+            'Logo Design' => 25,
+            'Banner' => 20,
+            'Grafica Avanzata' => 30,
+            'Bundle / Pack' => 40,
+            'Sviluppo Web' => null,
             'Altro' => null,
         ];
     }
