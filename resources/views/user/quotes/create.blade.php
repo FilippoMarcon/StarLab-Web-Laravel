@@ -46,6 +46,7 @@
         <input type="file" name="files[]" multiple
             class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-amber-500 file:text-white file:font-bold file:text-sm hover:file:bg-amber-400 file:cursor-pointer file:transition-all">
         <p class="text-xs text-slate-500 mt-1">Qualsiasi tipo di file. Max 25MB per file.</p>
+        @error('files') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
         @error('files.*') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
     </div>
 
