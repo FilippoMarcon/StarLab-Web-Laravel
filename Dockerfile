@@ -6,7 +6,8 @@ RUN apk add --no-cache nginx supervisor curl ca-certificates openssl libpng-dev 
     && echo "upload_max_filesize = 100M" > /usr/local/etc/php/conf.d/uploads.ini \
     && echo "post_max_size = 105M" >> /usr/local/etc/php/conf.d/uploads.ini \
     && echo "max_execution_time = 300" >> /usr/local/etc/php/conf.d/uploads.ini \
-    && echo "max_input_time = 300" >> /usr/local/etc/php/conf.d/uploads.ini
+    && echo "max_input_time = 300" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/uploads.ini
 
 ENV PGSSLMODE=require
 

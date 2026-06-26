@@ -129,6 +129,11 @@
                         <div class="min-w-0 flex-1 mr-2">
                             <p class="text-xs text-slate-400 truncate">{{ $deliverable->original_name }}</p>
                             <p class="text-xs text-slate-500">{{ $deliverable->size_for_humans }}</p>
+                            @if ($deliverable->path_watermarked)
+                                <span class="text-xs text-amber-400 font-bold">&#9679; Watermark</span>
+                            @else
+                                <span class="text-xs text-red-400 font-bold">&#9679; NO watermark</span>
+                            @endif
                         </div>
                         <div class="flex items-center gap-1 shrink-0">
                             @if ($deliverable->isImage())
