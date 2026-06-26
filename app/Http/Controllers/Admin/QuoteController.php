@@ -161,24 +161,42 @@ class QuoteController extends Controller
     private function applyLogoWatermark($sourcePath, $destPath)
     {
         $logoPath = public_path('images/StarLab-Logo.png');
-        if (!file_exists($logoPath)) return;
+        if (!file_exists($logoPath)) {
+            \Log::error('Watermark: logo not found at ' . $logoPath);
+            return;
+        }
 
-        $info = getimagesize($sourcePath);
-        if (!$info) return;
+        $info = @getimagesize($sourcePath);
+        if (!$info) {
+            \Log::error('Watermark: getimagesize failed for ' . $sourcePath);
+            return;
+        }
 
         $width = $info[0];
         $height = $info[1];
         $mime = $info['mime'];
 
         switch ($mime) {
-            case 'image/jpeg': $srcImg = imagecreatefromjpeg($sourcePath); break;
-            case 'image/png': $srcImg = imagecreatefrompng($sourcePath); break;
-            case 'image/gif': $srcImg = imagecreatefromgif($sourcePath); break;
-            case 'image/webp': $srcImg = imagecreatefromwebp($sourcePath); break;
-            default: return;
+            case 'image/jpeg': $srcImg = @imagecreatefromjpeg($sourcePath); break;
+            case 'image/png': $srcImg = @imagecreatefrompng($sourcePath); break;
+            case 'image/gif': $srcImg = @imagecreatefromgif($sourcePath); break;
+            case 'image/webp': $srcImg = @imagecreatefromwebp($sourcePath); break;
+            default:
+                \Log::error('Watermark: unsupported mime ' . $mime);
+                return;
         }
 
-        $logoImg = imagecreatefrompng($logoPath);
+        if (!$srcImg) {
+            \Log::error('Watermark: imagecreate failed for ' . $sourcePath);
+            return;
+        }
+
+        $logoImg = @imagecreatefrompng($logoPath);
+        if (!$logoImg) {
+            \Log::error('Watermark: logo imagecreate failed');
+            return;
+        }
+
         $logoSrcW = imagesx($logoImg);
         $logoSrcH = imagesy($logoImg);
 
@@ -188,25 +206,32 @@ class QuoteController extends Controller
         $spacingX = intval($logoW * 1.3);
         $spacingY = intval($logoH * 1.3);
 
-        $watermarked = imagecreatetruecolor($width, $height);
+        $watermarked = @imagecreatetruecolor($width, $height);
+        if (!$watermarked) {
+            \Log::error('Watermark: imagecreatetruecolor failed for size ' . $width . 'x' . $height);
+            imagedestroy($srcImg);
+            imagedestroy($logoImg);
+            return;
+        }
+
         imagecopy($watermarked, $srcImg, 0, 0, 0, 0, $width, $height);
 
         for ($x = 0; $x < $width; $x += $spacingX) {
             for ($y = 0; $y < $height; $y += $spacingY) {
-                imagecopyresampled($watermarked, $logoImg, $x, $y, 0, 0, $logoW, $logoH, $logoSrcW, $logoSrcH);
+                @imagecopyresampled($watermarked, $logoImg, $x, $y, 0, 0, $logoW, $logoH, $logoSrcW, $logoSrcH);
             }
         }
 
         imagedestroy($logoImg);
 
-        imagecopymerge($srcImg, $watermarked, 0, 0, 0, 0, $width, $height, 30);
+        @imagecopymerge($srcImg, $watermarked, 0, 0, 0, 0, $width, $height, 30);
         imagedestroy($watermarked);
 
         switch ($mime) {
-            case 'image/jpeg': imagejpeg($srcImg, $destPath, 90); break;
-            case 'image/png': imagepng($srcImg, $destPath, 9); break;
-            case 'image/gif': imagegif($srcImg, $destPath); break;
-            case 'image/webp': imagewebp($srcImg, $destPath, 90); break;
+            case 'image/jpeg': @imagejpeg($srcImg, $destPath, 90); break;
+            case 'image/png': @imagepng($srcImg, $destPath, 9); break;
+            case 'image/gif': @imagegif($srcImg, $destPath); break;
+            case 'image/webp': @imagewebp($srcImg, $destPath, 90); break;
         }
         imagedestroy($srcImg);
     }
