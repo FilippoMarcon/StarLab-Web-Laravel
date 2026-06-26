@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Quote;
 use App\Models\QuoteAttachment;
 use App\Models\QuoteDeliverable;
+use App\Models\DownloadLog;
 use Illuminate\Http\Request;
 use App\Services\CloudinaryUrl;
 use Illuminate\Support\Facades\Storage;
@@ -21,6 +22,8 @@ class QuoteController extends Controller
             $query->where('status', 'pending');
         } elseif ($request->status === 'contacted') {
             $query->where('status', 'contacted');
+        } elseif ($request->status === 'in_progress') {
+            $query->where('status', 'in_progress');
         } elseif ($request->payment === 'deposit') {
             $query->whereNotNull('deposit_paid_at')->whereNull('paid_at');
         } elseif ($request->payment === 'paid') {
@@ -42,7 +45,7 @@ class QuoteController extends Controller
     public function updateStatus(Request $request, Quote $quote)
     {
         $data = $request->validate([
-            'status' => 'required|in:pending,contacted,done',
+            'status' => 'required|in:pending,contacted,in_progress,done',
             'staff_notes' => 'nullable|string',
             'amount' => 'nullable|numeric|min:0|max:999999.99',
         ]);
@@ -56,7 +59,16 @@ class QuoteController extends Controller
             $updateData['amount'] = $data['amount'];
         }
 
+        $oldStatus = $quote->status;
+        $oldNotes = $quote->staff_notes;
         $quote->update($updateData);
+        if ($oldStatus !== $quote->status) {
+            $statusLabels = ['pending' => 'In attesa', 'contacted' => 'Contattato', 'in_progress' => 'In lavorazione', 'done' => 'Completato'];
+            $quote->logActivity('status.changed', 'Stato cambiato in ' . ($statusLabels[$quote->status] ?? $quote->status));
+        }
+        if ($oldNotes !== $quote->staff_notes && !empty($quote->staff_notes)) {
+            $quote->logActivity('note.added', 'Nota aggiunta dallo staff');
+        }
         return redirect()->route('admin.quotes.show', $quote)->with('success', 'Preventivo aggiornato.');
     }
 
@@ -109,6 +121,7 @@ class QuoteController extends Controller
                     'mime_type' => $file->getMimeType(),
                     'size' => $file->getSize(),
                 ]);
+                $quote->logActivity('deliverable.uploaded', 'Grafica caricata: ' . $file->getClientOriginalName());
                 $uploaded++;
             } catch (\Throwable $e) {
                 \Log::error('Upload deliverable error: ' . $e->getMessage(), [
@@ -130,12 +143,31 @@ class QuoteController extends Controller
     {
         if ($deliverable->quote_id !== $quote->id) abort(404);
 
+        $isWatermarked = !$quote->isPaid();
+
         if (!$quote->isPaid()) {
             if ($deliverable->path_watermarked) {
+                DownloadLog::create([
+                    'quote_id' => $quote->id,
+                    'user_id' => auth()->id(),
+                    'file_type' => $deliverable->mime_type ?? 'unknown',
+                    'file_name' => $deliverable->original_name ?? 'file',
+                    'is_watermarked' => true,
+                    'ip_address' => request()->ip(),
+                ]);
                 return redirect(CloudinaryUrl::get($deliverable->path_watermarked));
             }
             return back()->with('error', 'Nessuna anteprima disponibile.');
         }
+
+        DownloadLog::create([
+            'quote_id' => $quote->id,
+            'user_id' => auth()->id(),
+            'file_type' => $deliverable->mime_type ?? 'unknown',
+            'file_name' => $deliverable->original_name ?? 'file',
+            'is_watermarked' => false,
+            'ip_address' => request()->ip(),
+        ]);
 
         return redirect(CloudinaryUrl::get($deliverable->path_original));
     }
@@ -145,6 +177,14 @@ class QuoteController extends Controller
         if ($attachment->quote_id !== $quote->id) {
             abort(404);
         }
+        DownloadLog::create([
+            'quote_id' => $quote->id,
+            'user_id' => auth()->id(),
+            'file_type' => $attachment->mime_type ?? 'unknown',
+            'file_name' => $attachment->original_name ?? 'file',
+            'is_watermarked' => false,
+            'ip_address' => request()->ip(),
+        ]);
         return redirect(CloudinaryUrl::get($attachment->path));
     }
 
@@ -184,7 +224,9 @@ class QuoteController extends Controller
             'deposit_paypal_txn_id' => 'SIMULATO_' . Str::random(16),
             'staff_notes' => 'L\'acconto del 50% è stato ricevuto! Iniziamo a lavorare alla tua grafica.',
             'staff_notes_updated_at' => now(),
+            'status' => 'in_progress',
         ]);
+        $quote->logActivity('deposit.paid', 'Acconto del 50% simulato (test)');
         return redirect()->route('admin.quotes.show', $quote)
             ->with('success', 'Acconto del 50% simulato con successo (nessun addebito reale).');
     }
@@ -195,6 +237,7 @@ class QuoteController extends Controller
             'paid_at' => null,
             'paypal_txn_id' => null,
         ]);
+        $quote->logActivity('simulation.reset', 'Simulazione saldo rimossa');
         return redirect()->route('admin.quotes.show', $quote)
             ->with('success', 'Simulazione saldo rimossa. Il preventivo è tornato allo stato "saldo da pagare".');
     }
@@ -210,6 +253,7 @@ class QuoteController extends Controller
         if (!$quote->isDelivered()) {
             $quote->update(['delivered_at' => now()]);
         }
+        $quote->logActivity('final.paid', 'Saldo del 50% simulato (test)');
         return redirect()->route('admin.quotes.show', $quote)
             ->with('success', 'Saldo del 50% simulato con successo (nessun addebito reale).');
     }

@@ -44,8 +44,9 @@
             <span class="px-2.5 py-1 text-xs font-bold rounded-full
                 @if($quote->status === 'pending') bg-amber-900/30 text-amber-400
                 @elseif($quote->status === 'contacted') bg-blue-900/30 text-blue-400
+                @elseif($quote->status === 'in_progress') bg-violet-900/30 text-violet-400
                 @else bg-emerald-900/30 text-emerald-400 @endif">
-                {{ $quote->status === 'pending' ? 'In attesa' : ($quote->status === 'contacted' ? 'Contattato' : 'Completato') }}
+                {{ $quote->status === 'pending' ? 'In attesa' : ($quote->status === 'contacted' ? 'Contattato' : ($quote->status === 'in_progress' ? 'In lavorazione' : 'Completato')) }}
             </span>
             <span class="text-xs text-slate-500">{{ $quote->created_at->format('d/m/Y') }}</span>
         </div>

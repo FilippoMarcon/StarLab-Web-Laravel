@@ -84,5 +84,38 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::post('/quotes/{quote}/chat', [ChatController::class, 'send'])->name('chat.send');
 });
 
+// Sitemap
+Route::get('/sitemap.xml', [PageController::class, 'sitemap'])->name('sitemap');
+
+// Notifications API
+Route::middleware('user')->get('/api/user/notifications', function () {
+    $lastMsgSub = \Illuminate\Support\Facades\DB::table('quote_messages')
+        ->selectRaw('MAX(id) as max_id')->groupBy('quote_id');
+    $newReplyIds = \Illuminate\Support\Facades\DB::table('quote_messages')
+        ->joinSub($lastMsgSub, 'latest', fn($j) => $j->on('quote_messages.id', '=', 'latest.max_id'))
+        ->where('quote_messages.is_staff', true)
+        ->whereIn('quote_messages.quote_id', \App\Models\Quote::where('user_id', auth()->id())->pluck('id'))
+        ->pluck('quote_messages.quote_id')->toArray();
+    return response()->json([
+        'new_replies' => count($newReplyIds),
+        'total' => count($newReplyIds),
+    ]);
+})->name('api.user.notifications');
+
+Route::middleware('admin')->get('/api/admin/notifications', function () {
+    $newQuotes = \App\Models\Quote::where('created_at', '>=', now()->subDay())->count();
+    $lastMsgSub = \Illuminate\Support\Facades\DB::table('quote_messages')
+        ->selectRaw('MAX(id) as max_id')->groupBy('quote_id');
+    $pendingMsgIds = \Illuminate\Support\Facades\DB::table('quote_messages')
+        ->joinSub($lastMsgSub, 'latest', fn($j) => $j->on('quote_messages.id', '=', 'latest.max_id'))
+        ->where('quote_messages.is_staff', false)
+        ->pluck('quote_messages.quote_id')->toArray();
+    return response()->json([
+        'new_quotes' => $newQuotes,
+        'pending_messages' => count($pendingMsgIds),
+        'total' => $newQuotes + count($pendingMsgIds),
+    ]);
+})->name('api.admin.notifications');
+
 // Catch-all (must be last)
 Route::get('/{any}', [PageController::class, 'notFound'])->where('any', '.*')->name('notfound');

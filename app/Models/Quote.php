@@ -45,6 +45,25 @@ class Quote extends Model
         return $this->hasMany(QuoteMessage::class);
     }
 
+    public function activities()
+    {
+        return $this->hasMany(QuoteActivity::class)->latest();
+    }
+
+    public function downloadLogs()
+    {
+        return $this->hasMany(DownloadLog::class);
+    }
+
+    public function logActivity(string $type, string $description, ?int $userId = null): void
+    {
+        $this->activities()->create([
+            'type' => $type,
+            'description' => $description,
+            'user_id' => $userId ?? auth()->id(),
+        ]);
+    }
+
     public function isPaid(): bool
     {
         return $this->paid_at !== null;

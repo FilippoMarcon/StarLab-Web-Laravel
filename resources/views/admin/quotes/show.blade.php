@@ -40,11 +40,12 @@
             </div>
             <div>
                 <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Stato Attuale</p>
-                <span class="px-2 py-1 text-xs font-bold rounded-full
-                    @if($quote->status === 'pending') bg-amber-900/30 text-amber-400
-                    @elseif($quote->status === 'contacted') bg-blue-900/30 text-blue-400
-                    @else bg-emerald-900/30 text-emerald-400 @endif">
-                    {{ $quote->status === 'pending' ? 'In attesa' : ($quote->status === 'contacted' ? 'Contattato' : 'Completato') }}
+                    <span class="px-2 py-1 text-xs font-bold rounded-full
+                        @if($quote->status === 'pending') bg-amber-900/30 text-amber-400
+                        @elseif($quote->status === 'contacted') bg-blue-900/30 text-blue-400
+                        @elseif($quote->status === 'in_progress') bg-violet-900/30 text-violet-400
+                        @else bg-emerald-900/30 text-emerald-400 @endif">
+                        {{ $quote->status === 'pending' ? 'In attesa' : ($quote->status === 'contacted' ? 'Contattato' : ($quote->status === 'in_progress' ? 'In lavorazione' : 'Completato')) }}
                 </span>
             </div>
             @if ($quote->user)
@@ -212,6 +213,7 @@
                     <select name="status" class="px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-amber-500 outline-none transition-all">
                         <option value="pending" {{ $quote->status === 'pending' ? 'selected' : '' }}>In attesa</option>
                         <option value="contacted" {{ $quote->status === 'contacted' ? 'selected' : '' }}>Contattato</option>
+                        <option value="in_progress" {{ $quote->status === 'in_progress' ? 'selected' : '' }}>In lavorazione</option>
                         <option value="done" {{ $quote->status === 'done' ? 'selected' : '' }}>Completato</option>
                     </select>
                 </div>

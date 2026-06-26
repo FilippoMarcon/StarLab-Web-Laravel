@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Quote;
 use App\Models\QuoteAttachment;
 use App\Models\QuoteDeliverable;
+use App\Models\DownloadLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Services\CloudinaryUrl;
@@ -78,6 +79,7 @@ class QuoteController extends Controller
             'staff_notes' => 'Grazie per averci contattato! Ti ricontatteremo al più presto.',
             'staff_notes_updated_at' => now(),
         ]);
+        $quote->logActivity('quote.created', 'Richiesta ricevuta da ' . (auth()->user()->name ?? 'cliente'));
 
         foreach ($attachments as $att) {
             $att['quote_id'] = $quote->id;
@@ -100,6 +102,14 @@ class QuoteController extends Controller
     {
         if ($quote->user_id !== auth()->id()) abort(403);
         if ($attachment->quote_id !== $quote->id) abort(404);
+        DownloadLog::create([
+            'quote_id' => $quote->id,
+            'user_id' => auth()->id(),
+            'file_type' => $attachment->mime_type ?? 'unknown',
+            'file_name' => $attachment->original_name ?? 'file',
+            'is_watermarked' => false,
+            'ip_address' => request()->ip(),
+        ]);
         return redirect(CloudinaryUrl::get($attachment->path));
     }
 
@@ -107,6 +117,16 @@ class QuoteController extends Controller
     {
         if ($quote->user_id !== auth()->id()) abort(403);
         if ($deliverable->quote_id !== $quote->id) abort(404);
+
+        $isWatermarked = !$quote->isPaid();
+        DownloadLog::create([
+            'quote_id' => $quote->id,
+            'user_id' => auth()->id(),
+            'file_type' => $deliverable->mime_type ?? 'unknown',
+            'file_name' => $deliverable->original_name ?? 'file',
+            'is_watermarked' => $isWatermarked,
+            'ip_address' => request()->ip(),
+        ]);
 
         if ($quote->isPaid()) {
             return redirect(CloudinaryUrl::get($deliverable->path_original));

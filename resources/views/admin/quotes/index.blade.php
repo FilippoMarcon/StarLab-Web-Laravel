@@ -38,6 +38,10 @@
        class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all {{ $currentFilter === 'contacted' ? 'bg-amber-500 text-white' : 'bg-slate-800 text-slate-400 hover:text-white' }}">
         Contattati
     </a>
+    <a href="{{ route('admin.quotes.index', ['status' => 'in_progress']) }}"
+       class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all {{ $currentFilter === 'in_progress' ? 'bg-amber-500 text-white' : 'bg-slate-800 text-slate-400 hover:text-white' }}">
+        In Lavorazione
+    </a>
     <a href="{{ route('admin.quotes.index', ['payment' => 'deposit']) }}"
        class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all {{ $currentFilter === 'deposit' ? 'bg-amber-500 text-white' : 'bg-slate-800 text-slate-400 hover:text-white' }}">
         Acconti Ricevuti

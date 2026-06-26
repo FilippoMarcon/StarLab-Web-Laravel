@@ -97,11 +97,13 @@ class PaypalController extends Controller
             $quote->update([
                 'deposit_paid_at' => now(),
                 'deposit_paypal_txn_id' => $txn_id ?: null,
+                'status' => 'in_progress',
             ]);
             $quote->update([
                 'staff_notes' => 'L\'acconto del 50% è stato ricevuto! Iniziamo a lavorare alla tua grafica.',
                 'staff_notes_updated_at' => now(),
             ]);
+            $quote->logActivity('deposit.paid', 'Acconto del 50% pagato da ' . ($quote->email ?? 'cliente'));
             Log::info("PayPal IPN: deposit completed for quote {$quote->id}");
         } else {
             if ($quote->isPaid()) {
@@ -127,6 +129,7 @@ class PaypalController extends Controller
                 'staff_notes' => 'Il saldo finale è stato ricevuto con successo! Puoi scaricare le versioni originali senza watermark.',
                 'staff_notes_updated_at' => now(),
             ]);
+            $quote->logActivity('final.paid', 'Saldo del 50% pagato da ' . ($quote->email ?? 'cliente'));
             Log::info("PayPal IPN: final payment completed for quote {$quote->id}");
         }
 

@@ -60,4 +60,28 @@ class PageController extends Controller
     {
         return view('pages.not-found');
     }
+
+    public function sitemap()
+    {
+        $routes = [
+            ['loc' => url('/'), 'priority' => '1.0'],
+            ['loc' => route('portfolio'), 'priority' => '0.9'],
+            ['loc' => route('starweb'), 'priority' => '0.8'],
+            ['loc' => route('stargraphics'), 'priority' => '0.8'],
+            ['loc' => route('contact'), 'priority' => '0.7'],
+            ['loc' => route('news'), 'priority' => '0.7'],
+            ['loc' => route('company'), 'priority' => '0.7'],
+            ['loc' => route('pricing'), 'priority' => '0.8'],
+            ['loc' => route('terms'), 'priority' => '0.5'],
+        ];
+
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+        foreach ($routes as $r) {
+            $xml .= '<url><loc>' . e($r['loc']) . '</loc><priority>' . $r['priority'] . '</priority></url>';
+        }
+        $xml .= '</urlset>';
+
+        return response($xml, 200, ['Content-Type' => 'application/xml']);
+    }
 }

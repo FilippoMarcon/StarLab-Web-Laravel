@@ -67,6 +67,7 @@ class QuoteController extends Controller
             'staff_notes' => 'Grazie per averci contattato! Ti ricontatteremo al più presto.',
             'staff_notes_updated_at' => now(),
         ]);
+        $quote->logActivity('quote.created', 'Richiesta ricevuta da ' . ($data['name'] ?? 'cliente'));
 
         foreach ($attachments as $att) {
             $att['quote_id'] = $quote->id;
