@@ -88,6 +88,11 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
 Route::get('/sitemap.xml', [PageController::class, 'sitemap'])->name('sitemap');
 
 // Notifications API
+Route::middleware('auth')->post('/api/ping', function () {
+    auth()->user()->update(['last_activity_at' => now()]);
+    return response()->json(['ok' => true]);
+})->name('api.ping');
+
 Route::middleware('user')->get('/api/user/notifications', function () {
     $lastMsgSub = \Illuminate\Support\Facades\DB::table('quote_messages')
         ->selectRaw('MAX(id) as max_id')->groupBy('quote_id');

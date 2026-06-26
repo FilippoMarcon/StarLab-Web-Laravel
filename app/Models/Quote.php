@@ -27,14 +27,27 @@ class Quote extends Model
         ];
     }
 
+    public function clientLastActivity(): ?\Illuminate\Support\Carbon
+    {
+        return $this->user?->last_activity_at;
+    }
+
+    public function staffLastActivity(): ?\Illuminate\Support\Carbon
+    {
+        $staff = \App\Models\User::whereIn('role', ['admin', 'staff'])->latest('last_activity_at')->first();
+        return $staff?->last_activity_at;
+    }
+
     public function isClientOnline(): bool
     {
-        return $this->client_last_viewed_at && $this->client_last_viewed_at->gt(now()->subMinutes(5));
+        $last = $this->clientLastActivity();
+        return $last && $last->gt(now()->subMinutes(5));
     }
 
     public function isStaffOnline(): bool
     {
-        return $this->staff_last_viewed_at && $this->staff_last_viewed_at->gt(now()->subMinutes(5));
+        $last = $this->staffLastActivity();
+        return $last && $last->gt(now()->subMinutes(5));
     }
 
     public function user()

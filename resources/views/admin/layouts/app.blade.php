@@ -50,12 +50,16 @@
     <script>
     function showToast(message, type) {
         var container = document.getElementById('toast-container');
-        var colors = type === 'error' ? 'bg-red-900/80 border-red-700 text-red-200' : 'bg-emerald-900/80 border-emerald-700 text-emerald-200';
+        var colors = type === 'error' ? 'bg-red-900/80 border-red-700 text-red-200' : (type === 'info' ? 'bg-sky-900/80 border-sky-700 text-sky-200' : 'bg-emerald-900/80 border-emerald-700 text-emerald-200');
         var toast = document.createElement('div');
         toast.className = 'px-4 py-3 rounded-xl border text-sm font-bold shadow-2xl animate-slide-up ' + colors;
         toast.textContent = message;
         container.appendChild(toast);
         setTimeout(function() { toast.remove(); }, 5000);
+    }
+
+    function pingActivity() {
+        navigator.sendBeacon('{{ route('api.ping') }}', '');
     }
 
     function checkNotifications() {
@@ -68,6 +72,7 @@
                 if (data.total > 0) {
                     badge.textContent = data.total;
                     badge.classList.remove('hidden');
+                    badge.style.cursor = 'pointer';
                 } else {
                     badge.classList.add('hidden');
                 }
@@ -77,7 +82,12 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('notif-bell').addEventListener('click', function() {
+            showToast('Apri la Dashboard per vedere le notifiche.', 'info');
+        });
+        pingActivity();
         checkNotifications();
+        setInterval(pingActivity, 120000);
         setInterval(checkNotifications, 30000);
     });
     </script>

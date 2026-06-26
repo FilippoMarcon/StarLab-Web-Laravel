@@ -3,11 +3,11 @@
 @php
     if ($isStaff) {
         $online = $quote->isClientOnline();
-        $lastSeen = $quote->client_last_viewed_at;
+        $lastSeen = $quote->clientLastActivity();
         $subject = 'Cliente';
     } else {
         $online = $quote->isStaffOnline();
-        $lastSeen = $quote->staff_last_viewed_at;
+        $lastSeen = $quote->staffLastActivity();
         $subject = 'Staff';
     }
 @endphp

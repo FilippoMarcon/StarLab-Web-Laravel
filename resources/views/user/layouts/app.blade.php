@@ -60,6 +60,10 @@
         setTimeout(function() { toast.remove(); }, 5000);
     }
 
+    function pingActivity() {
+        navigator.sendBeacon('{{ route('api.ping') }}', '');
+    }
+
     function checkNotifications() {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '{{ route('api.user.notifications') }}', true);
@@ -79,7 +83,12 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('notif-bell').addEventListener('click', function() {
+            showToast('Controlla le tue richieste per nuovi messaggi o aggiornamenti.', 'info');
+        });
+        pingActivity();
         checkNotifications();
+        setInterval(pingActivity, 120000);
         setInterval(checkNotifications, 30000);
     });
     </script>
