@@ -14,17 +14,17 @@
 
     <div>
         <label class="block text-sm font-bold text-slate-300 mb-2">Tipo di Servizio *</label>
-        <select name="service_type" required
-            class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-amber-500 outline-none transition-all">
-            <option value="">Seleziona un servizio</option>
-            <option value="Logo Design">Logo Design</option>
-            <option value="Thumbnail & Social">Thumbnail &amp; Social</option>
-            <option value="Banner">Banner</option>
-            <option value="Grafica Avanzata">Grafica Avanzata</option>
-            <option value="Sviluppo Web">Sviluppo Web</option>
-            <option value="Bundle / Pack">Bundle / Pack</option>
-            <option value="Altro">Altro</option>
-        </select>
+            <select name="service_type" required
+                class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-amber-500 outline-none transition-all">
+                <option value="">Seleziona un servizio</option>
+                <option value="Logo Design" {{ old('service_type') === 'Logo Design' ? 'selected' : '' }}>Logo Design</option>
+                <option value="Thumbnail & Social" {{ old('service_type') === 'Thumbnail & Social' ? 'selected' : '' }}>Thumbnail &amp; Social</option>
+                <option value="Banner" {{ old('service_type') === 'Banner' ? 'selected' : '' }}>Banner</option>
+                <option value="Grafica Avanzata" {{ old('service_type') === 'Grafica Avanzata' ? 'selected' : '' }}>Grafica Avanzata</option>
+                <option value="Sviluppo Web" {{ old('service_type') === 'Sviluppo Web' ? 'selected' : '' }}>Sviluppo Web</option>
+                <option value="Bundle / Pack" {{ old('service_type') === 'Bundle / Pack' ? 'selected' : '' }}>Bundle / Pack</option>
+                <option value="Altro" {{ old('service_type') === 'Altro' ? 'selected' : '' }}>Altro</option>
+            </select>
         @error('service_type') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
     </div>
 
