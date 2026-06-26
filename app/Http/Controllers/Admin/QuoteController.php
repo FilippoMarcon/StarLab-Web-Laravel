@@ -62,7 +62,9 @@ class QuoteController extends Controller
                 $tmpFile = tempnam(sys_get_temp_dir(), 'wm_');
                 $this->applyLogoWatermark($file->getRealPath(), $tmpFile);
                 if (file_exists($tmpFile)) {
-                    Storage::disk('cloudinary')->put($watermarkedPath, file_get_contents($tmpFile));
+                    $handle = fopen($tmpFile, 'rb');
+                    Storage::disk('cloudinary')->put($watermarkedPath, $handle);
+                    fclose($handle);
                     unlink($tmpFile);
                 }
             }
