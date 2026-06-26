@@ -75,6 +75,7 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::delete('/quotes/{quote}/deliverable/{deliverable}', [AdminQuoteController::class, 'destroyDeliverable'])->name('quotes.deliverables.destroy');
     Route::get('/quotes/{quote}/download/{attachment}', [AdminQuoteController::class, 'downloadAttachment'])->name('quotes.download');
     Route::get('/quotes/{quote}/deliverable/{deliverable}', [AdminQuoteController::class, 'downloadDeliverable'])->name('quotes.deliverable');
+    Route::delete('/quotes/{quote}', [AdminQuoteController::class, 'destroy'])->name('quotes.destroy');
     Route::get('/quotes/{quote}/chat', [ChatController::class, 'messages'])->name('chat.messages');
     Route::post('/quotes/{quote}/chat', [ChatController::class, 'send'])->name('chat.send');
 });

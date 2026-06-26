@@ -103,11 +103,24 @@ class QuoteController extends Controller
         return redirect(CloudinaryUrl::get($attachment->path));
     }
 
+    public function destroy(Quote $quote)
+    {
+        foreach ($quote->deliverables as $deliverable) {
+            Storage::disk('cloudinary')->delete([$deliverable->path_original, $deliverable->path_watermarked]);
+        }
+        foreach ($quote->attachments as $attachment) {
+            Storage::disk('cloudinary')->delete($attachment->path);
+        }
+        $quote->delete();
+
+        return redirect()->route('admin.quotes.index')->with('success', 'Preventivo eliminato.');
+    }
+
     public function destroyDeliverable(Quote $quote, QuoteDeliverable $deliverable)
     {
         if ($deliverable->quote_id !== $quote->id) abort(404);
 
-        Storage::disk($this->disk)->delete([$deliverable->path_original, $deliverable->path_watermarked]);
+        Storage::disk('cloudinary')->delete([$deliverable->path_original, $deliverable->path_watermarked]);
         $deliverable->delete();
 
         return redirect()->route('admin.quotes.show', $quote)->with('success', 'Grafica eliminata.');
