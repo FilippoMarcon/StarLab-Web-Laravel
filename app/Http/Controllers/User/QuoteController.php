@@ -32,32 +32,24 @@ class QuoteController extends Controller
             'files.*' => 'nullable|file|max:25600',
         ]);
 
-        $quote = Quote::create([
-            'user_id' => auth()->id(),
-            'name' => auth()->user()->name,
-            'email' => auth()->user()->email,
-            'phone' => $request->phone,
-            'service_type' => $data['service_type'],
-            'description' => $data['description'],
-            'status' => 'pending',
-            'token' => Str::uuid(),
-        ]);
+        $token = Str::uuid();
+
+        $attachments = [];
 
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
                 try {
                     if (!$file || !$file->isValid()) continue;
                     $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
-                    $path = $file->storeAs('quotes/' . $quote->id, $filename, 'cloudinary');
+                    $path = $file->storeAs('uploads/' . $token, $filename, 'cloudinary');
                     if ($path) {
-                        QuoteAttachment::create([
-                            'quote_id' => $quote->id,
+                        $attachments[] = [
                             'filename' => $filename,
                             'original_name' => $file->getClientOriginalName(),
                             'path' => $path,
                             'mime_type' => $file->getMimeType(),
                             'size' => $file->getSize(),
-                        ]);
+                        ];
                     }
                 } catch (\Throwable $e) {
                     \Log::error('Quote (user) file upload error: ' . $e->getMessage(), [
@@ -69,6 +61,22 @@ class QuoteController extends Controller
                     return back()->withInput()->withErrors(['files' => 'Errore caricamento file: ' . $e->getMessage()]);
                 }
             }
+        }
+
+        $quote = Quote::create([
+            'user_id' => auth()->id(),
+            'name' => auth()->user()->name,
+            'email' => auth()->user()->email,
+            'phone' => $request->phone,
+            'service_type' => $data['service_type'],
+            'description' => $data['description'],
+            'status' => 'pending',
+            'token' => $token,
+        ]);
+
+        foreach ($attachments as $att) {
+            $att['quote_id'] = $quote->id;
+            QuoteAttachment::create($att);
         }
 
         return redirect()->route('user.quotes.show', $quote)->with('success', 'Richiesta inviata con successo!');
