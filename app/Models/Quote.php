@@ -21,8 +21,20 @@ class Quote extends Model
             'paid_at' => 'datetime',
             'deposit_paid_at' => 'datetime',
             'delivered_at' => 'datetime',
+            'client_last_viewed_at' => 'datetime',
+            'staff_last_viewed_at' => 'datetime',
             'amount' => 'decimal:2',
         ];
+    }
+
+    public function isClientOnline(): bool
+    {
+        return $this->client_last_viewed_at && $this->client_last_viewed_at->gt(now()->subMinutes(5));
+    }
+
+    public function isStaffOnline(): bool
+    {
+        return $this->staff_last_viewed_at && $this->staff_last_viewed_at->gt(now()->subMinutes(5));
     }
 
     public function user()

@@ -104,7 +104,7 @@
                 Dettagli
             </a>
             @if ($quote->isPaid() && $quote->deliverables->count() > 0)
-            <a href="{{ route('user.quotes.show', $quote) }}" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-lg transition-all">
+            <a href="{{ route('user.quotes.show', $quote) }}#grafiche" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold rounded-lg transition-all">
                 Scarica Originali
             </a>
             @endif

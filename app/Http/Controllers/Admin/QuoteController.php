@@ -39,6 +39,7 @@ class QuoteController extends Controller
     public function show(Quote $quote)
     {
         $quote->load('attachments', 'deliverables', 'messages.user');
+        $quote->update(['staff_last_viewed_at' => now()]);
         return view('admin.quotes.show', compact('quote'));
     }
 

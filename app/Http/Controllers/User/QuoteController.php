@@ -95,6 +95,7 @@ class QuoteController extends Controller
             abort(403);
         }
         $quote->load('attachments', 'deliverables', 'messages.user');
+        $quote->update(['client_last_viewed_at' => now()]);
         return view('user.quotes.show', compact('quote'));
     }
 

@@ -140,7 +140,7 @@
     @endif
 
     @if ($quote->deliverables->count() > 0)
-    <div class="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl space-y-3">
+    <div id="grafiche" class="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl space-y-3">
         <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">
             Grafiche Consegnate
             @if (!$quote->isPaid())
