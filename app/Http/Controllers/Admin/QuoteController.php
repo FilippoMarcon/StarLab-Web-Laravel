@@ -75,10 +75,10 @@ class QuoteController extends Controller
                             $handle = fopen($tmpFile, 'rb');
                             Storage::disk('cloudinary')->put($watermarkedPath, $handle);
                             fclose($handle);
-                            unlink($tmpFile);
+                            @unlink($tmpFile);
                         }
                     } catch (\Throwable $we) {
-                        \Log::warning('Watermark failed for ' . $filename . ': ' . $we->getMessage());
+                        error_log('Watermark failed for ' . $filename . ': ' . $we->getMessage());
                         $watermarkedPath = null;
                     }
                 }
