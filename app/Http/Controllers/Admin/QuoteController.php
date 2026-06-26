@@ -168,6 +168,8 @@ class QuoteController extends Controller
         $quote->update([
             'deposit_paid_at' => now(),
             'deposit_paypal_txn_id' => 'SIMULATO_' . Str::random(16),
+            'staff_notes' => 'L\'acconto del 50% è stato ricevuto! Iniziamo a lavorare alla tua grafica.',
+            'staff_notes_updated_at' => now(),
         ]);
         return redirect()->route('admin.quotes.show', $quote)
             ->with('success', 'Acconto del 50% simulato con successo (nessun addebito reale).');
@@ -188,6 +190,8 @@ class QuoteController extends Controller
         $quote->update([
             'paid_at' => now(),
             'paypal_txn_id' => 'SIMULATO_' . Str::random(16),
+            'staff_notes' => 'Il saldo finale è stato ricevuto con successo! Puoi scaricare le versioni originali senza watermark.',
+            'staff_notes_updated_at' => now(),
         ]);
         if (!$quote->isDelivered()) {
             $quote->update(['delivered_at' => now()]);

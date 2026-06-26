@@ -74,6 +74,11 @@ class QuoteController extends Controller
             'token' => $token,
         ]);
 
+        $quote->update([
+            'staff_notes' => 'Grazie per averci contattato! Ti ricontatteremo al più presto.',
+            'staff_notes_updated_at' => now(),
+        ]);
+
         foreach ($attachments as $att) {
             $att['quote_id'] = $quote->id;
             QuoteAttachment::create($att);
