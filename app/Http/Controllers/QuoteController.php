@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\Quote;
 use App\Models\QuoteAttachment;
 use Illuminate\Http\Request;
@@ -18,7 +19,8 @@ class QuoteController extends Controller
             'phone' => 'nullable|string|max:20',
             'service_type' => 'required|string|max:255',
             'description' => 'required|string',
-            'files.*' => 'nullable|file|max:25600',
+            'files' => 'nullable|array',
+            'files.*' => 'file|max:25600',
         ]);
 
         $quote = Quote::create([
@@ -36,23 +38,24 @@ class QuoteController extends Controller
                 try {
                     if (!$file || !$file->isValid()) continue;
                     $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
-                    $path = 'quotes/' . $quote->id . '/' . $filename;
-                    Storage::disk('cloudinary')->put($path, file_get_contents($file->getRealPath()));
-                    QuoteAttachment::create([
-                        'quote_id' => $quote->id,
-                        'filename' => $filename,
-                        'original_name' => $file->getClientOriginalName(),
-                        'path' => $path,
-                        'mime_type' => $file->getMimeType(),
-                        'size' => $file->getSize(),
-                    ]);
+                    $path = $file->storeAs('quotes/' . $quote->id, $filename, 'cloudinary');
+                    if ($path) {
+                        QuoteAttachment::create([
+                            'quote_id' => $quote->id,
+                            'filename' => $filename,
+                            'original_name' => $file->getClientOriginalName(),
+                            'path' => $path,
+                            'mime_type' => $file->getMimeType(),
+                            'size' => $file->getSize(),
+                        ]);
+                    }
                 } catch (\Exception $e) {
                     \Log::error('Quote file upload error: ' . $e->getMessage());
-                    return back()->withInput()->withErrors(['files' => 'Errore caricamento file: ' . $e->getMessage()]);
+                    return back()->withInput()->withErrors(['files' => 'Errore caricamento file. Riprova o contattaci.']);
                 }
             }
         }
 
-        return back()->with('success', 'Richiesta inviata con successo! Ti contatteremo presto.')->with('token', $quote->token);
+        return redirect()->route('preventivo.show', $quote->token)->with('success', 'Richiesta inviata con successo! Ti contatteremo presto.');
     }
 }

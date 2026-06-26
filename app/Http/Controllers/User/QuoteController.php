@@ -48,19 +48,20 @@ class QuoteController extends Controller
                 try {
                     if (!$file || !$file->isValid()) continue;
                     $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
-                    $path = 'quotes/' . $quote->id . '/' . $filename;
-                    Storage::disk('cloudinary')->put($path, file_get_contents($file->getRealPath()));
-                    QuoteAttachment::create([
-                        'quote_id' => $quote->id,
-                        'filename' => $filename,
-                        'original_name' => $file->getClientOriginalName(),
-                        'path' => $path,
-                        'mime_type' => $file->getMimeType(),
-                        'size' => $file->getSize(),
-                    ]);
+                    $path = $file->storeAs('quotes/' . $quote->id, $filename, 'cloudinary');
+                    if ($path) {
+                        QuoteAttachment::create([
+                            'quote_id' => $quote->id,
+                            'filename' => $filename,
+                            'original_name' => $file->getClientOriginalName(),
+                            'path' => $path,
+                            'mime_type' => $file->getMimeType(),
+                            'size' => $file->getSize(),
+                        ]);
+                    }
                 } catch (\Exception $e) {
                     \Log::error('Quote file upload error: ' . $e->getMessage());
-                    return back()->withInput()->withErrors(['files' => 'Errore caricamento file: ' . $e->getMessage()]);
+                    return back()->withInput()->withErrors(['files' => 'Errore caricamento file. Riprova o contattaci.']);
                 }
             }
         }
