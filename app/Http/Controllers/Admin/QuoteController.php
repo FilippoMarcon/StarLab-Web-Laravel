@@ -76,7 +76,6 @@ class QuoteController extends Controller
                         if (file_exists($tmpFile)) {
                             $handle = fopen($tmpFile, 'rb');
                             Storage::disk('cloudinary')->put($watermarkedPath, $handle);
-                            fclose($handle);
                             @unlink($tmpFile);
                         }
                     } catch (\Throwable $we) {
