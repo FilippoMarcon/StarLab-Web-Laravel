@@ -252,6 +252,27 @@
             </a>
             @endif
         </div>
+        <div class="mt-4 p-4 bg-amber-900/20 border border-amber-800/40 rounded-xl">
+            <p class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3">Test Pagamenti (nessun addebito reale)</p>
+            <div class="flex flex-wrap gap-2">
+                @if (!$quote->hasPaidDeposit())
+                <form method="POST" action="{{ route('admin.quotes.simulate-deposit', $quote) }}">
+                    @csrf
+                    <button type="submit" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg text-sm transition-all whitespace-nowrap">
+                        Simula Pagamento Acconto 50%
+                    </button>
+                </form>
+                @endif
+                @if ($quote->hasPaidDeposit() && !$quote->isPaid())
+                <form method="POST" action="{{ route('admin.quotes.simulate-final', $quote) }}">
+                    @csrf
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-sm transition-all whitespace-nowrap">
+                        Simula Pagamento Saldo 50%
+                    </button>
+                </form>
+                @endif
+            </div>
+        </div>
     </div>
 
     </div>{{-- end left column --}}
