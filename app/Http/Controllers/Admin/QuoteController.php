@@ -132,7 +132,10 @@ class QuoteController extends Controller
     public function destroy(Quote $quote)
     {
         foreach ($quote->deliverables as $deliverable) {
-            Storage::disk('cloudinary')->delete([$deliverable->path_original, $deliverable->path_watermarked]);
+            $paths = array_filter([$deliverable->path_original, $deliverable->path_watermarked]);
+            if ($paths) {
+                Storage::disk('cloudinary')->delete($paths);
+            }
         }
         foreach ($quote->attachments as $attachment) {
             Storage::disk('cloudinary')->delete($attachment->path);
@@ -146,7 +149,10 @@ class QuoteController extends Controller
     {
         if ($deliverable->quote_id !== $quote->id) abort(404);
 
-        Storage::disk('cloudinary')->delete([$deliverable->path_original, $deliverable->path_watermarked]);
+        $paths = array_filter([$deliverable->path_original, $deliverable->path_watermarked]);
+        if ($paths) {
+            Storage::disk('cloudinary')->delete($paths);
+        }
         $deliverable->delete();
 
         return redirect()->route('admin.quotes.show', $quote)->with('success', 'Grafica eliminata.');
