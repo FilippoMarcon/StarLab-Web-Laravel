@@ -94,26 +94,45 @@
     @if ($quote->hasAmount())
     <div class="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl">
         <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Preventivo Economico</h3>
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-xs text-slate-500">Prezzo</p>
-                <p class="text-3xl font-black text-amber-500">&euro;{{ number_format($quote->amount, 2) }}</p>
-            </div>
-            <div class="text-right">
-                @if ($quote->isPaid())
-                    <div class="flex items-center gap-2">
-                        <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
-                        <span class="text-emerald-400 font-bold">Pagato</span>
-                    </div>
-                    <p class="text-xs text-slate-500 mt-1">{{ $quote->paid_at->format('d/m/Y H:i') }}</p>
-                @else
-                    <form method="POST" action="{{ route('user.quotes.checkout', $quote) }}">
-                        @csrf
-                        <button type="submit" class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-white font-bold rounded-xl transition-all shadow-lg shadow-amber-500/25">
-                            Paga Ora
-                        </button>
-                    </form>
-                @endif
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-slate-500">Totale</p>
+                    <p class="text-3xl font-black text-amber-500">&euro;{{ number_format($quote->amount, 2) }}</p>
+                </div>
+                <div class="text-right space-y-2">
+                    @if ($quote->isPaid())
+                        <div class="flex items-center gap-2 justify-end">
+                            <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                            <span class="text-emerald-400 font-bold">Completamente Pagato</span>
+                        </div>
+                        <p class="text-xs text-slate-500">{{ $quote->paid_at->format('d/m/Y H:i') }}</p>
+                    @elseif ($quote->hasPaidDeposit() && $quote->isDelivered())
+                        <div class="flex items-center gap-2 justify-end">
+                            <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                            <span class="text-emerald-400 font-bold text-sm">Acconto 50% pagato</span>
+                        </div>
+                        <form method="POST" action="{{ route('user.quotes.checkout', ['quote' => $quote, 'type' => 'final']) }}">
+                            @csrf
+                            <button type="submit" class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-white font-bold rounded-xl transition-all shadow-lg shadow-amber-500/25">
+                                Paga Saldo 50% (&euro;{{ number_format($quote->finalAmount(), 2) }})
+                            </button>
+                        </form>
+                    @elseif ($quote->hasPaidDeposit())
+                        <div class="flex items-center gap-2 justify-end">
+                            <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                            <span class="text-emerald-400 font-bold text-sm">Acconto 50% pagato</span>
+                        </div>
+                        <p class="text-xs text-slate-500 text-right">In attesa della consegna grafica</p>
+                    @else
+                        <form method="POST" action="{{ route('user.quotes.checkout', ['quote' => $quote, 'type' => 'deposit']) }}">
+                            @csrf
+                            <button type="submit" class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-white font-bold rounded-xl transition-all shadow-lg shadow-amber-500/25">
+                                Paga Acconto 50% (&euro;{{ number_format($quote->depositAmount(), 2) }})
+                            </button>
+                        </form>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
@@ -124,7 +143,7 @@
         <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">
             Grafiche Consegnate
             @if (!$quote->isPaid())
-            <span class="text-xs font-normal text-slate-500">(anteprima con logo)</span>
+            <span class="text-xs font-normal text-slate-500">(anteprima con watermark)</span>
             @endif
         </h3>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -157,7 +176,7 @@
             @endforeach
         </div>
         @if (!$quote->isPaid())
-        <p class="text-xs text-slate-500 mt-2">Dopo il pagamento, potrai scaricare le versioni originali senza watermark.</p>
+        <p class="text-xs text-slate-500 mt-2">Dopo il saldo finale, potrai scaricare le versioni originali senza watermark.</p>
         @endif
     </div>
     @endif
@@ -183,12 +202,16 @@
                 Richiesta ricevuta - ti risponderemo entro 24 ore
             </li>
             <li class="flex items-center gap-2">
-                <span class="w-6 h-6 rounded-full @if($quote->status === 'contacted') bg-blue-900/30 text-blue-400 @else bg-slate-800 text-slate-500 @endif flex items-center justify-center text-xs font-bold">2</span>
-                Ti contatteremo per discutere i dettagli
+                <span class="w-6 h-6 rounded-full @if($quote->hasPaidDeposit()) bg-emerald-900/30 text-emerald-400 @else bg-slate-800 text-slate-500 @endif flex items-center justify-center text-xs font-bold">2</span>
+                Pagamento acconto 50% - iniziamo a lavorare alla tua grafica
             </li>
             <li class="flex items-center gap-2">
-                <span class="w-6 h-6 rounded-full @if($quote->status === 'done') bg-emerald-900/30 text-emerald-400 @else bg-slate-800 text-slate-500 @endif flex items-center justify-center text-xs font-bold">3</span>
-                Lavoro completato!
+                <span class="w-6 h-6 rounded-full @if($quote->isDelivered()) bg-blue-900/30 text-blue-400 @else bg-slate-800 text-slate-500 @endif flex items-center justify-center text-xs font-bold">3</span>
+                Consegna grafica con watermark + saldo finale 50%
+            </li>
+            <li class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full @if($quote->isPaid()) bg-emerald-900/30 text-emerald-400 @else bg-slate-800 text-slate-500 @endif flex items-center justify-center text-xs font-bold">4</span>
+                Lavoro completato! Scarica le versioni originali senza watermark
             </li>
         </ul>
     </div>

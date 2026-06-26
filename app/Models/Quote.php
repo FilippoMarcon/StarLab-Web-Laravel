@@ -11,6 +11,7 @@ class Quote extends Model
         'user_id', 'name', 'email', 'phone', 'service_type', 'description',
         'status', 'token', 'staff_notes', 'staff_notes_updated_at',
         'amount', 'paid_at', 'paypal_txn_id',
+        'deposit_paid_at', 'deposit_paypal_txn_id', 'delivered_at',
     ];
 
     protected function casts(): array
@@ -18,6 +19,8 @@ class Quote extends Model
         return [
             'staff_notes_updated_at' => 'datetime',
             'paid_at' => 'datetime',
+            'deposit_paid_at' => 'datetime',
+            'delivered_at' => 'datetime',
             'amount' => 'decimal:2',
         ];
     }
@@ -47,9 +50,29 @@ class Quote extends Model
         return $this->paid_at !== null;
     }
 
+    public function hasPaidDeposit(): bool
+    {
+        return $this->deposit_paid_at !== null;
+    }
+
+    public function isDelivered(): bool
+    {
+        return $this->delivered_at !== null;
+    }
+
     public function hasAmount(): bool
     {
         return $this->amount !== null && $this->amount > 0;
+    }
+
+    public function depositAmount(): float
+    {
+        return $this->amount ? round($this->amount / 2, 2) : 0;
+    }
+
+    public function finalAmount(): float
+    {
+        return $this->amount ? round($this->amount / 2, 2) : 0;
     }
 
     public static function servicePrices(): array

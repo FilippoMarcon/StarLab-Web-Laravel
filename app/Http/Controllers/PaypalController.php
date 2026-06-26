@@ -79,26 +79,48 @@ class PaypalController extends Controller
             return response('OK', 200);
         }
 
-        if ($quote->isPaid()) {
-            Log::info("PayPal IPN: quote {$quote->id} already paid");
-            return response('OK', 200);
-        }
-
+        $paymentType = $payload['type'] ?? 'final';
         $txn_id = $data['txn_id'] ?? '';
-        if ($txn_id) {
-            $existing = Quote::where('paypal_txn_id', $txn_id)->first();
-            if ($existing) {
-                Log::info("PayPal IPN: duplicate txn_id: $txn_id");
+
+        if ($paymentType === 'deposit') {
+            if ($quote->hasPaidDeposit()) {
+                Log::info("PayPal IPN: deposit already paid for quote {$quote->id}");
                 return response('OK', 200);
             }
+            if ($txn_id) {
+                $existing = Quote::where('deposit_paypal_txn_id', $txn_id)->first();
+                if ($existing) {
+                    Log::info("PayPal IPN: duplicate deposit txn_id: $txn_id");
+                    return response('OK', 200);
+                }
+            }
+            $quote->update([
+                'deposit_paid_at' => now(),
+                'deposit_paypal_txn_id' => $txn_id ?: null,
+            ]);
+            Log::info("PayPal IPN: deposit completed for quote {$quote->id}");
+        } else {
+            if ($quote->isPaid()) {
+                Log::info("PayPal IPN: quote {$quote->id} already fully paid");
+                return response('OK', 200);
+            }
+            if (!$quote->hasPaidDeposit()) {
+                Log::warning("PayPal IPN: final payment before deposit for quote {$quote->id}");
+                return response('OK', 200);
+            }
+            if ($txn_id) {
+                $existing = Quote::where('paypal_txn_id', $txn_id)->first();
+                if ($existing) {
+                    Log::info("PayPal IPN: duplicate final txn_id: $txn_id");
+                    return response('OK', 200);
+                }
+            }
+            $quote->update([
+                'paid_at' => now(),
+                'paypal_txn_id' => $txn_id ?: null,
+            ]);
+            Log::info("PayPal IPN: final payment completed for quote {$quote->id}");
         }
-
-        $quote->update([
-            'paid_at' => now(),
-            'paypal_txn_id' => $txn_id ?: null,
-        ]);
-
-        Log::info("PayPal IPN: payment completed for quote {$quote->id}");
 
         return response('OK', 200);
     }

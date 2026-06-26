@@ -114,7 +114,7 @@ class QuoteController extends Controller
         return back()->with('error', 'Nessuna anteprima disponibile.');
     }
 
-    public function checkout(Quote $quote)
+    public function checkout(Request $request, Quote $quote)
     {
         if ($quote->user_id !== auth()->id()) {
             abort(403);
@@ -122,10 +122,29 @@ class QuoteController extends Controller
         if (!$quote->hasAmount()) {
             return back()->withErrors(['amount' => 'Nessun prezzo impostato per questo preventivo.']);
         }
-        if ($quote->isPaid()) {
-            return back()->withErrors(['paid' => 'Questo preventivo è già stato pagato.']);
+
+        $paymentType = $request->query('type', 'deposit');
+
+        if ($paymentType === 'deposit') {
+            if ($quote->hasPaidDeposit()) {
+                return back()->withErrors(['paid' => 'Acconto già pagato.']);
+            }
+            $amount = $quote->depositAmount();
+            $label = 'Acconto 50%';
+        } else {
+            if ($quote->isPaid()) {
+                return back()->withErrors(['paid' => 'Preventivo già saldato.']);
+            }
+            if (!$quote->hasPaidDeposit()) {
+                return back()->withErrors(['paid' => 'Devi prima pagare l\'acconto del 50%.']);
+            }
+            if (!$quote->isDelivered()) {
+                return back()->withErrors(['delivered' => 'La grafica non è stata ancora consegnata.']);
+            }
+            $amount = $quote->finalAmount();
+            $label = 'Saldo 50%';
         }
 
-        return view('user.quotes.paypal', compact('quote'));
+        return view('user.quotes.paypal', compact('quote', 'paymentType', 'amount', 'label'));
     }
 }

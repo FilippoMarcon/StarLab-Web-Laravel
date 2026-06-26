@@ -51,6 +51,11 @@ class PageController extends Controller
         return view('pages.service-detail', compact('id'));
     }
 
+    public function terms()
+    {
+        return view('pages.terms');
+    }
+
     public function notFound()
     {
         return view('pages.not-found');

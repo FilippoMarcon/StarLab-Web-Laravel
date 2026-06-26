@@ -22,8 +22,12 @@
         <p class="text-3xl font-black text-emerald-400">{{ $completedQuotes }}</p>
     </div>
     <div class="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl">
-        <p class="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">Pagamenti Ricevuti</p>
-        <p class="text-3xl font-black text-white">{{ $paidQuotes }}</p>
+        <p class="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">Acconti Ricevuti</p>
+        <p class="text-3xl font-black text-amber-400">{{ $depositQuotes }}</p>
+    </div>
+    <div class="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl">
+        <p class="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">Salda&shy;ti</p>
+        <p class="text-3xl font-black text-emerald-400">{{ $paidQuotes }}</p>
     </div>
     <div class="p-6 bg-slate-900/50 border border-slate-800 rounded-2xl">
         <p class="text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">Ricavi Totali</p>

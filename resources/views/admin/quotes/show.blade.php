@@ -90,17 +90,23 @@
         <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Preventivo Economico</h3>
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-xs text-slate-500">Prezzo Impostato</p>
+                <p class="text-xs text-slate-500">Prezzo Totale</p>
                 <p class="text-2xl font-black {{ $quote->hasAmount() ? 'text-white' : 'text-slate-600' }}">
                     {{ $quote->hasAmount() ? '€' . number_format($quote->amount, 2) : 'Non impostato' }}
                 </p>
             </div>
-            <div class="text-right">
-                <p class="text-xs text-slate-500">Stato Pagamento</p>
-                @if ($quote->isPaid())
-                    <p class="text-emerald-400 font-bold">Pagato il {{ $quote->paid_at->format('d/m/Y') }}</p>
+            <div class="text-right space-y-1">
+                <p class="text-xs text-slate-500">Acconto 50%</p>
+                @if ($quote->hasPaidDeposit())
+                    <p class="text-emerald-400 font-bold text-sm">&check; Pagato il {{ $quote->deposit_paid_at->format('d/m/Y') }}</p>
                 @else
-                    <p class="text-slate-500">Non pagato</p>
+                    <p class="text-slate-500 text-sm">In attesa</p>
+                @endif
+                <p class="text-xs text-slate-500">Saldo 50%</p>
+                @if ($quote->isPaid())
+                    <p class="text-emerald-400 font-bold text-sm">&check; Pagato il {{ $quote->paid_at->format('d/m/Y') }}</p>
+                @else
+                    <p class="text-slate-500 text-sm">In attesa</p>
                 @endif
             </div>
         </div>
@@ -147,6 +153,9 @@
         @else
         <p class="text-sm text-slate-500">Nessuna grafica consegnata.</p>
         @endif
+        @if ($quote->isDelivered())
+        <p class="text-xs text-emerald-400 font-bold">Consegnato il {{ $quote->delivered_at->format('d/m/Y H:i') }}</p>
+        @endif
         <form method="POST" action="{{ route('admin.quotes.deliverables.upload', $quote) }}" enctype="multipart/form-data" class="pt-3 border-t border-slate-800">
             @csrf
             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Carica Nuove Grafiche</label>
@@ -155,7 +164,7 @@
                     class="flex-1 px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 focus:ring-2 focus:ring-amber-500 outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-amber-500 file:text-white file:font-bold file:text-sm hover:file:bg-amber-400 file:cursor-pointer file:transition-all">
                 <button type="submit" class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-white font-bold rounded-xl transition-all whitespace-nowrap">Carica</button>
             </div>
-            <p class="text-xs text-slate-500 mt-1">Le immagini verranno automaticamente marcate con il logo StarLab. Le originali sono scaricabili solo dopo il pagamento.</p>
+            <p class="text-xs text-slate-500 mt-1">Le immagini verranno automaticamente marcate con il logo StarLab. Le originali sono scaricabili solo dopo il saldo finale (50%).</p>
         </form>
     </div>
 
@@ -204,7 +213,8 @@
                     <button type="button" onclick="insertNote('Il preventivo \u00e8 in fase di elaborazione. Ti aggiorneremo a breve.')" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all">In elaborazione</button>
                     <button type="button" onclick="insertNote('Il lavoro \u00e8 stato completato! Puoi visualizzare e scaricare le grafiche nella sezione dedicata.')" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all">Completato</button>
                     <button type="button" onclick="insertNote('Servono maggiori informazioni per completare il preventivo. Puoi contattarci per maggiori dettagli.')" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all">Info mancanti</button>
-                    <button type="button" onclick="insertNote('Il pagamento \u00e8 stato ricevuto con successo! Puoi scaricare le versioni originali delle grafiche.')" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all">Pagamento ricevuto</button>
+                    <button type="button" onclick="insertNote('L\u2019acconto del 50% \u00e8 stato ricevuto! Iniziamo a lavorare alla tua grafica.')" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all">Acconto ricevuto</button>
+                    <button type="button" onclick="insertNote('Il saldo finale \u00e8 stato ricevuto con successo! Puoi scaricare le versioni originali senza watermark.')" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all">Saldo ricevuto</button>
                 </div>
                 <textarea name="staff_notes" rows="3" id="staff-notes-textarea" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-amber-500 outline-none transition-all" placeholder="Scrivi un aggiornamento per il cliente...">{{ $quote->staff_notes }}</textarea>
             </div>

@@ -62,8 +62,10 @@
 
     <div class="border-t pt-8 flex flex-col md:flex-row justify-between items-center text-xs transition-colors duration-300 dark:border-zinc-800 dark:text-zinc-500 border-slate-200 text-slate-500">
       <p>&copy; 2026 StarLab. Tutti i diritti riservati.</p>
-      <div class="flex items-center gap-1 mt-2 md:mt-0">
-        Made with <span class="text-red-500 animate-pulse">&hearts;</span> by <a href="{{ route('starweb') }}" class="transition-colors font-semibold cursor-pointer dark:text-blue-400 dark:hover:text-blue-300 text-blue-600 hover:text-blue-500">StarWeb Team</a>
+      <div class="flex items-center gap-4 mt-2 md:mt-0">
+        <a href="{{ route('terms') }}" class="text-xs hover:text-amber-400 transition-colors">Termini e Condizioni</a>
+        <span class="text-slate-600">|</span>
+        <span>Made with <span class="text-red-500 animate-pulse">&hearts;</span> by <a href="{{ route('starweb') }}" class="transition-colors font-semibold cursor-pointer dark:text-blue-400 dark:hover:text-blue-300 text-blue-600 hover:text-blue-500">StarWeb Team</a></span>
       </div>
     </div>
   </div>

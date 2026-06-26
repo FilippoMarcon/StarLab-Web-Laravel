@@ -22,6 +22,7 @@ Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::get('/news', [PageController::class, 'news'])->name('news');
 Route::get('/company', [PageController::class, 'company'])->name('company');
 Route::get('/pricing', [PageController::class, 'pricing'])->name('pricing');
+Route::get('/terms', [PageController::class, 'terms'])->name('terms');
 Route::get('/service/{id}', [PageController::class, 'serviceDetail'])->name('service.detail');
 
 // Auth (user)

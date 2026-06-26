@@ -80,6 +80,10 @@ class QuoteController extends Controller
             ]);
         }
 
+        if (!$quote->isDelivered()) {
+            $quote->update(['delivered_at' => now()]);
+        }
+
         return redirect()->route('admin.quotes.show', $quote)->with('success', 'Grafiche caricate con successo.');
     }
 

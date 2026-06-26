@@ -12,8 +12,9 @@
                 </svg>
             </div>
             <h1 class="text-2xl font-black text-white mt-4">Pagamento con PayPal</h1>
-            <p class="text-slate-400 mt-2">Stai per pagare <strong class="text-amber-500">&euro;{{ number_format($quote->amount, 2) }}</strong> per:</p>
+            <p class="text-slate-400 mt-2">Stai per pagare <strong class="text-amber-500">&euro;{{ number_format($amount, 2) }}</strong> (<strong>{{ $label }}</strong>) per:</p>
             <p class="text-slate-300 font-bold mt-1">{{ $quote->service_type }}</p>
+            <p class="text-xs text-slate-500 mt-1">Totale preventivo: &euro;{{ number_format($quote->amount, 2) }}</p>
         </div>
 
         @php
@@ -22,14 +23,14 @@
             $notifyUrl = route('paypal.ipn');
             $returnUrl = route('checkout.quote.success') . '?quote=' . $quote->id;
             $cancelUrl = route('checkout.quote.cancel');
-            $custom = json_encode(['quote_id' => $quote->id, 'user_id' => auth()->id()]);
+            $custom = json_encode(['quote_id' => $quote->id, 'user_id' => auth()->id(), 'type' => $paymentType]);
         @endphp
 
         <form action="{{ $paypalUrl }}" method="post" id="paypalForm">
             <input type="hidden" name="cmd" value="_xclick">
             <input type="hidden" name="business" value="starlabdesign@gmail.com">
             <input type="hidden" name="item_name" value="Preventivo #{{ $quote->id }} - {{ $quote->service_type }}">
-            <input type="hidden" name="amount" value="{{ number_format($quote->amount, 2, '.', '') }}">
+            <input type="hidden" name="amount" value="{{ number_format($amount, 2, '.', '') }}">
             <input type="hidden" name="currency_code" value="EUR">
             <input type="hidden" name="no_shipping" value="1">
             <input type="hidden" name="notify_url" value="{{ $notifyUrl }}">
