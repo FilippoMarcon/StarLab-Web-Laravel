@@ -65,8 +65,8 @@ class QuoteController extends Controller
 
                 $watermarkedPath = null;
                 if (str_starts_with($file->getMimeType(), 'image/')) {
+                    $watermarkedPath = 'quotes/' . $quote->id . '/deliverables/wm_' . $filename;
                     try {
-                        $watermarkedPath = 'quotes/' . $quote->id . '/deliverables/wm_' . $filename;
                         $tmpFile = tempnam(sys_get_temp_dir(), 'wm_');
                         $this->applyLogoWatermark($file->getRealPath(), $tmpFile);
                         if (file_exists($tmpFile)) {
@@ -76,10 +76,12 @@ class QuoteController extends Controller
                             unlink($tmpFile);
                         }
                     } catch (\Throwable $we) {
-                        \Log::warning('Watermark failed, original uploaded anyway: ' . $we->getMessage());
+                        \Log::warning('Watermark failed for ' . $filename . ': ' . $we->getMessage());
                         $watermarkedPath = null;
                     }
                 }
+
+                \Log::info('Creating deliverable: original=' . $originalPath . ' wm=' . ($watermarkedPath ?? 'null') . ' name=' . $file->getClientOriginalName());
 
                 QuoteDeliverable::create([
                     'quote_id' => $quote->id,
