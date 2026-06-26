@@ -137,8 +137,8 @@ Route::middleware('admin')->get('/api/admin/notifications', function () {
         if ($isNew) {
             $items[] = ['type' => 'new_quote', 'text' => "Nuovo preventivo da {$q->name}", 'url' => route('admin.quotes.show', $q), 'time' => $q->created_at->diffForHumans()];
         }
-        $lastMsgAt = $lastClientMsgs[$q->id] ?? null;
-        if ($lastMsgAt && (!$q->staff_last_viewed_at || $lastMsgAt > $q->staff_last_viewed_at)) {
+        $lastMsgAt = isset($lastClientMsgs[$q->id]) ? \Illuminate\Support\Carbon::parse($lastClientMsgs[$q->id]) : null;
+        if ($lastMsgAt && (!$q->staff_last_viewed_at || $lastMsgAt->gt($q->staff_last_viewed_at))) {
             $items[] = ['type' => 'pending_reply', 'text' => "{$q->name} ha scritto un messaggio", 'url' => route('admin.quotes.show', $q), 'time' => \Illuminate\Support\Carbon::parse($lastMsgAt)->diffForHumans()];
         }
     }
