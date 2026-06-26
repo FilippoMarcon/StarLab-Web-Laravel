@@ -51,4 +51,22 @@ class Quote extends Model
     {
         return $this->amount !== null && $this->amount > 0;
     }
+
+    public static function servicePrices(): array
+    {
+        return [
+            'Logo Design' => 199,
+            'Thumbnail & Social' => 79,
+            'Banner' => 99,
+            'Grafica Avanzata' => 299,
+            'Sviluppo Web' => 599,
+            'Bundle / Pack' => 299,
+            'Altro' => null,
+        ];
+    }
+
+    public function getServicePriceAttribute(): ?float
+    {
+        return self::servicePrices()[$this->service_type] ?? null;
+    }
 }

@@ -28,7 +28,11 @@
             @endif
             <div>
                 <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Servizio</p>
-                <p class="text-white">{{ $quote->service_type }}</p>
+                <p class="text-white">{{ $quote->service_type }}
+                    @if ($quote->service_price)
+                        <span class="ml-2 text-xs text-amber-400 font-bold">(da listino: €{{ number_format($quote->service_price, 2) }})</span>
+                    @endif
+                </p>
             </div>
             <div>
                 <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Data</p>
