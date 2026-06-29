@@ -32,8 +32,8 @@
 
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
-        "@type": "Organization",
+        "@@context": "https://schema.org",
+        "@@type": "Organization",
         "name": "StarLab",
         "url": "{{ url('/') }}",
         "logo": "{{ asset('images/StarLab-Logo.png') }}",
