@@ -75,8 +75,6 @@ class QuoteController extends Controller
 
     public function uploadDeliverable(Request $request, Quote $quote)
     {
-        error_log('UPLOAD_DELIVERABLE: reached controller for quote ' . $quote->id);
-
         $request->validate([
             'files.*' => 'required|file|max:102400',
         ]);
@@ -92,8 +90,6 @@ class QuoteController extends Controller
                     continue;
                 }
 
-                error_log('Deliverable file debug: mime=' . $file->getMimeType() . ' ext=' . $file->getClientOriginalExtension() . ' realpath=' . ($file->getRealPath() ?: 'NULL'));
-
                 $watermarkedPath = null;
                 if (str_starts_with($file->getMimeType(), 'image/')) {
                     $watermarkedPath = 'quotes/' . $quote->id . '/deliverables/wm_' . $filename;
@@ -106,12 +102,9 @@ class QuoteController extends Controller
                             @unlink($tmpFile);
                         }
                     } catch (\Throwable $we) {
-                        error_log('Watermark failed for ' . $filename . ': ' . $we->getMessage());
                         $watermarkedPath = null;
                     }
                 }
-
-                error_log('Creating deliverable: original=' . $originalPath . ' wm=' . ($watermarkedPath ?? 'null') . ' name=' . $file->getClientOriginalName());
 
                 QuoteDeliverable::create([
                     'quote_id' => $quote->id,
@@ -261,19 +254,13 @@ class QuoteController extends Controller
 
     private function applyLogoWatermark($sourcePath, $destPath)
     {
-        error_log('applyLogoWatermark called: source=' . $sourcePath . ' dest=' . $destPath);
-
         $logoPath = public_path('images/StarLab-Logo.png');
         if (!file_exists($logoPath)) {
-            error_log('Watermark: logo not found at ' . $logoPath);
             return;
         }
 
-        error_log('Watermark: logo found, source exists=' . (file_exists($sourcePath) ? 'yes' : 'no') . ' size=' . (file_exists($sourcePath) ? filesize($sourcePath) : 'N/A'));
-
         $info = @getimagesize($sourcePath);
         if (!$info) {
-            error_log('Watermark: getimagesize failed for ' . $sourcePath);
             return;
         }
 
@@ -287,18 +274,15 @@ class QuoteController extends Controller
             case 'image/gif': $srcImg = @imagecreatefromgif($sourcePath); break;
             case 'image/webp': $srcImg = @imagecreatefromwebp($sourcePath); break;
             default:
-                error_log('Watermark: unsupported mime ' . $mime);
                 return;
         }
 
         if (!$srcImg) {
-            error_log('Watermark: imagecreate failed for ' . $sourcePath);
             return;
         }
 
         $logoImg = @imagecreatefrompng($logoPath);
         if (!$logoImg) {
-            error_log('Watermark: logo imagecreate failed');
             return;
         }
 

@@ -10,8 +10,8 @@
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
         <div class="text-center mb-16">
             <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Contatti</span>
-            <h1 class="text-4xl sm:text-5xl font-bold text-white mt-3">Richiedi un preventivo</h1>
-            <p class="text-slate-400 mt-4 max-w-xl mx-auto">Raccontami la tua idea. Ti rispondo entro 24h con un preventivo gratuito e senza impegno.</p>
+            <h1 class="text-4xl sm:text-5xl font-bold text-white mt-3">Richiedi il tuo preventivo gratuito</h1>
+            <p class="text-slate-400 mt-4 max-w-xl mx-auto">Raccontami la tua idea. Ti rispondo io entro 24h con un preventivo chiaro, senza impegno. Niente chiamate, niente pressioni.</p>
         </div>
 
         @if (session('success'))
