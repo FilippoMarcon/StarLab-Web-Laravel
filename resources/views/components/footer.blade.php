@@ -12,23 +12,21 @@
       </div>
 
       <div>
-        <h4 class="font-bold mb-6 dark:text-white text-slate-900">Servizi</h4>
+        <h4 class="font-bold mb-6 dark:text-white text-slate-900">StarWeb</h4>
         <ul class="space-y-3 text-sm dark:text-zinc-400 text-slate-600">
-          <li><a href="{{ route('servizi.show', 'logo-design') }}" class="hover:text-indigo-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer">Logo Design</a></li>
-          <li><a href="{{ route('servizi.show', 'branding') }}" class="hover:text-indigo-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer">Branding</a></li>
-          <li><a href="{{ route('servizi.show', 'social-media-design') }}" class="hover:text-indigo-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer">Social Media Design</a></li>
-          <li><a href="{{ route('servizi.show', 'print-design') }}" class="hover:text-indigo-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer">Print Design</a></li>
-          <li><a href="{{ route('servizi.show', 'web-development') }}" class="hover:text-indigo-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer">Sviluppo Web</a></li>
+          <li><a href="{{ route('service.detail', 'web-development') }}" class="hover:text-blue-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer dark:hover:text-blue-400 hover:text-blue-600">Web Development</a></li>
+          <li><a href="{{ route('service.detail', 'frontend') }}" class="hover:text-blue-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer dark:hover:text-blue-400 hover:text-blue-600">Frontend Development</a></li>
+          <li><a href="{{ route('service.detail', 'seo') }}" class="hover:text-blue-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer dark:hover:text-blue-400 hover:text-blue-600">SEO & Performance</a></li>
         </ul>
       </div>
 
       <div>
-        <h4 class="font-bold mb-6 dark:text-white text-slate-900">StarLab</h4>
+        <h4 class="font-bold mb-6 dark:text-white text-slate-900">StarGraphics</h4>
         <ul class="space-y-3 text-sm dark:text-zinc-400 text-slate-600">
-          <li><a href="{{ route('portfolio.index') }}" class="hover:text-indigo-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer">Portfolio</a></li>
-          <li><a href="{{ route('about') }}" class="hover:text-indigo-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer">About</a></li>
-          <li><a href="{{ route('blog.index') }}" class="hover:text-indigo-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer">Blog</a></li>
-          <li><a href="{{ route('contatti') }}" class="hover:text-indigo-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer">Contatti</a></li>
+          <li><a href="{{ route('service.detail', 'branding') }}" class="hover:text-pink-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer dark:hover:text-pink-400 hover:text-pink-600">Branding</a></li>
+          <li><a href="{{ route('service.detail', 'ui-ux') }}" class="hover:text-pink-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer dark:hover:text-pink-400 hover:text-pink-600">UI/UX Design</a></li>
+          <li><a href="{{ route('service.detail', 'graphic-design') }}" class="hover:text-pink-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer dark:hover:text-pink-400 hover:text-pink-600">Graphic Design</a></li>
+          <li><a href="{{ route('service.detail', '3d-modeling') }}" class="hover:text-pink-400 transition-colors text-left w-full hover:translate-x-1 duration-200 cursor-pointer dark:hover:text-pink-400 hover:text-pink-600">3D Modeling</a></li>
         </ul>
       </div>
 
