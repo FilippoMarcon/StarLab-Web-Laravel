@@ -7,7 +7,7 @@
         <span class="text-xl font-bold tracking-tight hidden sm:block dark:text-white text-slate-900">StarLab</span>
       </div>
       <div class="hidden lg:flex items-center gap-8">
-        @foreach ([['label' => 'Home', 'route' => 'home'], ['label' => 'Pricing', 'route' => 'pricing'], ['label' => 'Contatti', 'route' => 'contact'], ['label' => 'Portfolio', 'route' => 'portfolio'], ['label' => 'News', 'route' => 'news']] as $item)
+        @foreach ([['label' => 'Home', 'route' => 'home'], ['label' => 'Servizi', 'route' => 'servizi.index'], ['label' => 'Portfolio', 'route' => 'portfolio.index'], ['label' => 'Blog', 'route' => 'blog.index'], ['label' => 'Contatti', 'route' => 'contatti']] as $item)
           <a href="{{ route($item['route']) }}" class="nav-link text-sm font-medium transition-all duration-300 relative group py-2 cursor-pointer {{ request()->routeIs($item['route']) ? 'active' : '' }}">
             {{ $item['label'] }}
             <span class="absolute bottom-0 left-0 h-0.5 bg-yellow-400 transition-all duration-300 {{ request()->routeIs($item['route']) ? 'w-full' : 'w-0 group-hover:w-full' }}"></span>
@@ -25,7 +25,7 @@
       <button onclick="toggleDarkMode()" class="p-2 rounded-lg transition-colors cursor-pointer dark:hover:bg-zinc-800 hover:bg-slate-100 dark:text-yellow-400 text-slate-600" aria-label="Toggle Dark Mode" id="dark-toggle">
       </button>
       <div class="flex items-center gap-3">
-        <a href="{{ route('company') }}" class="px-5 py-2 text-sm font-semibold rounded-lg transition-all duration-300 border cursor-pointer dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-200 dark:border-zinc-700 dark:hover:border-zinc-600 bg-white hover:bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 hover:shadow-sm">Company</a>
+        <a href="{{ route('about') }}" class="px-5 py-2 text-sm font-semibold rounded-lg transition-all duration-300 border cursor-pointer dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-200 dark:border-zinc-700 dark:hover:border-zinc-600 bg-white hover:bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 hover:shadow-sm">About</a>
         @auth
           @if (in_array(Auth::user()->role, ['staff', 'admin']))
             <a href="{{ route('admin.dashboard') }}" class="px-5 py-2 text-sm font-semibold rounded-lg transition-all duration-300 border cursor-pointer dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-200 dark:border-zinc-700 dark:hover:border-zinc-600 bg-white hover:bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 hover:shadow-sm">Admin</a>
@@ -53,14 +53,14 @@
   </nav>
 
 <div id="mobile-menu" class="hidden lg:hidden fixed inset-x-0 z-40 p-6 flex flex-col gap-3 shadow-xl transition-all duration-300 dark:bg-zinc-900/95 dark:border dark:border-zinc-800 bg-white/95 backdrop-blur-xl border border-slate-200 max-h-[calc(100vh-100px)] overflow-y-auto" style="margin-left: 1rem; margin-right: 1rem; border-radius: 1rem;">
-  @foreach ([['label' => 'Home', 'href' => route('home')], ['label' => 'Pricing', 'href' => route('pricing')], ['label' => 'Contatti', 'href' => route('contact')], ['label' => 'Portfolio', 'href' => route('portfolio')], ['label' => 'News', 'href' => route('news')]] as $item)
+  @foreach ([['label' => 'Home', 'href' => route('home')], ['label' => 'Servizi', 'href' => route('servizi.index')], ['label' => 'Portfolio', 'href' => route('portfolio.index')], ['label' => 'Blog', 'href' => route('blog.index')], ['label' => 'Contatti', 'href' => route('contatti')]] as $item)
     <a href="{{ $item['href'] }}" class="mobile-nav-item text-left text-base font-medium py-2.5 border-b cursor-pointer dark:text-zinc-400 dark:border-zinc-800 text-slate-500 border-slate-100">{{ $item['label'] }}</a>
   @endforeach
   <div class="grid grid-cols-2 gap-3 py-3">
     <a href="{{ route('starweb') }}" class="p-3 rounded-xl text-center text-xs font-bold cursor-pointer dark:bg-zinc-800 dark:border dark:border-zinc-700 dark:text-blue-400 bg-slate-50 border border-blue-200 text-blue-600">StarWeb</a>
     <a href="{{ route('stargraphics') }}" class="p-3 rounded-xl text-center text-xs font-bold cursor-pointer dark:bg-zinc-800 dark:border dark:border-zinc-700 dark:text-pink-400 bg-slate-50 border border-pink-200 text-pink-600">StarGraphics</a>
   </div>
-  <a href="{{ route('company') }}" class="text-center py-3 rounded-xl font-semibold text-base border cursor-pointer dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-700 bg-slate-100 text-slate-900 border-slate-200">Company</a>
+  <a href="{{ route('about') }}" class="text-center py-3 rounded-xl font-semibold text-base border cursor-pointer dark:bg-zinc-800 dark:text-zinc-200 dark:border-zinc-700 bg-slate-100 text-slate-900 border-slate-200">About</a>
   @auth
     <a href="{{ route('user.dashboard') }}" class="text-center py-3 rounded-xl font-semibold text-base cursor-pointer dark:bg-amber-500 dark:text-white bg-amber-500 text-white">Dashboard</a>
     <form method="POST" action="{{ route('logout') }}">

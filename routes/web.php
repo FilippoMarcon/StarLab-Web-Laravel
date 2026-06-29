@@ -8,22 +8,32 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PaypalController;
 use App\Http\Controllers\PublicQuoteController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PortfolioController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\QuoteController as AdminQuoteController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\User\QuoteController as UserQuoteController;
 
 // Public routes
-Route::get('/', [PageController::class, 'home'])->name('home');
-Route::get('/portfolio', [PageController::class, 'portfolio'])->name('portfolio');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
+Route::get('/portfolio/{slug}', [PortfolioController::class, 'show'])->name('portfolio.show');
+Route::get('/servizi', [ServiceController::class, 'index'])->name('servizi.index');
+Route::get('/servizi/{slug}', [ServiceController::class, 'show'])->name('servizi.show');
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+Route::get('/about', [AboutController::class, 'index'])->name('about');
+Route::get('/contatti', [ContactController::class, 'index'])->name('contatti');
+Route::post('/contatti/send', [ContactController::class, 'send'])->name('contatti.send');
 Route::get('/starweb', [PageController::class, 'starweb'])->name('starweb');
 Route::get('/stargraphics', [PageController::class, 'stargraphics'])->name('stargraphics');
-Route::get('/contact', [PageController::class, 'contact'])->name('contact');
-Route::get('/news', [PageController::class, 'news'])->name('news');
-Route::get('/company', [PageController::class, 'company'])->name('company');
 Route::get('/pricing', [PageController::class, 'pricing'])->name('pricing');
 Route::get('/terms', [PageController::class, 'terms'])->name('terms');
-Route::get('/service/{id}', [PageController::class, 'serviceDetail'])->name('service.detail');
 
 // Auth (user)
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -69,6 +79,10 @@ Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.log
 // Admin (protected)
 Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::resource('projects', \App\Http\Controllers\Admin\ProjectController::class);
+    Route::resource('services', \App\Http\Controllers\Admin\ServiceController::class);
+    Route::resource('posts', \App\Http\Controllers\Admin\PostController::class);
+    Route::resource('testimonials', \App\Http\Controllers\Admin\TestimonialController::class);
     Route::get('/quotes', [AdminQuoteController::class, 'index'])->name('quotes.index');
     Route::get('/quotes/{quote}', [AdminQuoteController::class, 'show'])->name('quotes.show');
     Route::post('/quotes/{quote}/status', [AdminQuoteController::class, 'updateStatus'])->name('quotes.status');
@@ -146,6 +160,11 @@ Route::middleware('admin')->get('/api/admin/notifications', function () {
     usort($items, fn($a, $b) => strtotime($b['time'] ?? 'now') - strtotime($a['time'] ?? 'now'));
     return response()->json(['total' => count($items), 'items' => array_slice($items, 0, 10)]);
 })->name('api.admin.notifications');
+
+// Legacy redirects
+Route::redirect('/contact', '/contatti', 301);
+Route::redirect('/company', '/about', 301);
+Route::redirect('/news', '/blog', 301);
 
 // Catch-all (must be last)
 Route::get('/{any}', [PageController::class, 'notFound'])->where('any', '.*')->name('notfound');

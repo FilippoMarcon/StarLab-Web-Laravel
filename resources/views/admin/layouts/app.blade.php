@@ -19,6 +19,9 @@
                     <div class="hidden md:flex items-center gap-1">
                         <a href="{{ route('admin.dashboard') }}" class="px-4 py-2 text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-all">Dashboard</a>
                         <a href="{{ route('admin.quotes.index') }}" class="px-4 py-2 text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-all">Preventivi</a>
+                        <a href="{{ route('admin.projects.index') }}" class="px-4 py-2 text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-all">Progetti</a>
+                        <a href="{{ route('admin.services.index') }}" class="px-4 py-2 text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-all">Servizi</a>
+                        <a href="{{ route('admin.posts.index') }}" class="px-4 py-2 text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-all">Blog</a>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
