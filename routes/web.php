@@ -80,7 +80,6 @@ Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.log
 Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('projects', \App\Http\Controllers\Admin\ProjectController::class);
-    Route::delete('projects/image/{image}', [\App\Http\Controllers\Admin\ProjectController::class, 'destroyImage'])->name('projects.image.destroy');
     Route::resource('services', \App\Http\Controllers\Admin\ServiceController::class);
     Route::resource('posts', \App\Http\Controllers\Admin\PostController::class);
     Route::resource('testimonials', \App\Http\Controllers\Admin\TestimonialController::class);

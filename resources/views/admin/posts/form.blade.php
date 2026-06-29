@@ -8,7 +8,7 @@
     <h1 class="text-3xl font-black text-white uppercase tracking-tight mt-2">{{ $post ? 'Modifica: ' . $post->title : 'Nuovo Articolo' }}</h1>
 </div>
 
-<form method="POST" action="{{ $post ? route('admin.posts.update', $post) : route('admin.posts.store') }}" enctype="multipart/form-data" class="max-w-2xl space-y-6">
+<form method="POST" action="{{ $post ? route('admin.posts.update', $post) : route('admin.posts.store') }}" class="max-w-2xl space-y-6">
     @csrf
     @if ($post) @method('PUT') @endif
 
@@ -26,16 +26,10 @@
     </div>
 
     <div>
-        <label class="block text-sm font-bold text-slate-300 mb-2">Immagine di copertina</label>
-        <input type="file" name="image" accept="image/*"
-            class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-amber-500 file:text-white file:font-bold file:cursor-pointer hover:file:bg-amber-400 transition-all">
+        <label class="block text-sm font-bold text-slate-300 mb-2">URL Immagine</label>
+        <input type="url" name="image" value="{{ old('image', $post->image ?? '') }}"
+            class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all">
         @error('image') <p class="text-red-400 text-xs mt-1">{{ $message }}</p> @enderror
-        @if ($post && $post->image)
-            <div class="mt-3">
-                <img src="{{ $post->image }}" alt="" class="w-48 rounded-xl border border-slate-700">
-                <p class="text-xs text-slate-500 mt-1">Immagine attuale. Carica un nuovo file per sostituirla.</p>
-            </div>
-        @endif
     </div>
 
     <div class="grid grid-cols-2 gap-4">

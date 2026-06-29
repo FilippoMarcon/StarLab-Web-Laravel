@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'About | StarLab | Graphic Design per Creator')
-@section('og-title', 'StarLab | Chi Sono - Graphic Designer per Creator e Gaming')
-@section('og-description', 'Graphic designer specializzato in logo, overlay, branding per creator, streamer e gaming team. Design che funziona, senza compromessi.')
+@section('title', 'About | StarLab')
+@section('og-title', 'StarLab | Chi Sono')
+@section('og-description', 'Graphic designer specializzato in logo design, branding e social media design. Scopri il mio lavoro e la mia visione.')
 
 @section('content')
 
@@ -10,41 +10,27 @@
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
         <div class="text-center mb-16">
             <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">About</span>
-            <h1 class="text-4xl sm:text-5xl font-bold text-white mt-3">Ciao, sono un graphic designer</h1>
-            <p class="text-slate-400 mt-4 max-w-2xl mx-auto text-lg">Creo identità visive per creator, streamer e brand che vogliono essere riconoscibili. Niente template, niente design generico. Solo progetti su misura, progettati per funzionare.</p>
+            <h1 class="text-4xl sm:text-5xl font-bold text-white mt-3">Chi sono</h1>
         </div>
 
         <div class="grid lg:grid-cols-5 gap-12 items-start">
-            <div class="lg:col-span-3 space-y-8">
-                <div>
-                    <h2 class="text-xl font-bold text-white mb-3">Perch&eacute; lavoro con creator e gaming</h2>
-                    <p class="text-slate-400 leading-relaxed">
-                        Perch&eacute; so quanto sia importante avere un'identit&agrave; visiva che ti rappresenti davvero. 
-                        Che tu sia uno streamer su Twitch, un content creator su YouTube o un gaming team su Discord, 
-                        il tuo pubblico riconosce la differenza tra un design fatto con cura e uno fatto in fretta.
-                    </p>
-                </div>
-
-                <div>
-                    <h2 class="text-xl font-bold text-white mb-3">Come lavoro</h2>
-                    <p class="text-slate-400 leading-relaxed">
-                        Ogni progetto parte da una chiacchierata. Mi racconti cosa ti serve, chi &egrave; il tuo pubblico, 
-                        che stile ti piace. Da l&igrave; sviluppo 2-3 concept tra cui scegliere, e lavoriamo insieme 
-                        per rifinire fino al risultato perfetto. Non mi fermo finch&eacute; non sei soddisfatto al 100%.
-                    </p>
-                </div>
-
-                <div>
-                    <h2 class="text-xl font-bold text-white mb-3">Cosa ottieni</h2>
-                    <p class="text-slate-400 leading-relaxed">
-                        File pronti all'uso in tutti i formati necessari, organizzati e consegnati in modo professionale. 
-                        Ogni progetto include revisioni illimitate fino al tuo via libera. Niente stress, niente sorprese.
-                    </p>
-                </div>
-
+            <div class="lg:col-span-3 space-y-6">
+                <p class="text-lg text-slate-400 leading-relaxed">
+                    Ciao! Sono un graphic designer con una passione per la creazione di identità visive 
+                    che comunicano, emozionano e rimangono impresse.
+                </p>
+                <p class="text-slate-400 leading-relaxed">
+                    Ogni progetto che realizzo parte da un ascolto attento delle esigenze del cliente. 
+                    Il mio obiettivo non è solo fare un design bello, ma creare qualcosa che funzioni 
+                    davvero per il tuo brand.
+                </p>
+                <p class="text-slate-400 leading-relaxed">
+                    Lavoro con creator, startup e aziende che vogliono distinguersi e comunicare 
+                    il proprio valore attraverso un'identità visiva professionale e curata nei minimi dettagli.
+                </p>
                 <div class="pt-4">
                     <a href="{{ route('contatti') }}" class="inline-flex items-center px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all duration-200">
-                        Parliamo del tuo progetto
+                        Lavoriamo insieme
                         <svg class="w-4 h-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                     </a>
                 </div>
@@ -52,30 +38,30 @@
 
             <div class="lg:col-span-2 space-y-6">
                 <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800">
-                    <h3 class="text-sm font-bold text-white mb-4">In numeri</h3>
+                    <h3 class="text-sm font-bold text-white mb-4">Numeri</h3>
                     <div class="space-y-4">
                         <div>
                             <p class="text-2xl font-bold text-white">{{ $projectCount }}+</p>
                             <p class="text-xs text-slate-500">Progetti completati</p>
                         </div>
                         <div>
-                            <p class="text-2xl font-bold text-emerald-400">&lt; 24h</p>
+                            <p class="text-2xl font-bold text-emerald-400">24h</p>
                             <p class="text-xs text-slate-500">Tempo medio di risposta</p>
                         </div>
                         <div>
-                            <p class="text-2xl font-bold text-indigo-400">&infin;</p>
-                            <p class="text-xs text-slate-500">Revisioni incluse</p>
+                            <p class="text-2xl font-bold text-indigo-400">100%</p>
+                            <p class="text-xs text-slate-500">Clienti soddisfatti</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800">
-                    <h3 class="text-sm font-bold text-white mb-4">Strumenti che uso</h3>
+                    <h3 class="text-sm font-bold text-white mb-4">Cosa uso</h3>
                     <div class="flex flex-wrap gap-2">
                         <span class="px-3 py-1 text-xs font-bold rounded-lg bg-slate-800 text-slate-300">Adobe Illustrator</span>
                         <span class="px-3 py-1 text-xs font-bold rounded-lg bg-slate-800 text-slate-300">Adobe Photoshop</span>
                         <span class="px-3 py-1 text-xs font-bold rounded-lg bg-slate-800 text-slate-300">Figma</span>
-                        <span class="px-3 py-1 text-xs font-bold rounded-lg bg-slate-800 text-slate-300">After Effects</span>
+                        <span class="px-3 py-1 text-xs font-bold rounded-lg bg-slate-800 text-slate-300">Canva</span>
                         <span class="px-3 py-1 text-xs font-bold rounded-lg bg-slate-800 text-slate-300">Blender</span>
                     </div>
                 </div>
@@ -87,7 +73,7 @@
 @if ($testimonials->isNotEmpty())
 <section class="py-20 bg-slate-900/30">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
-        <h2 class="text-2xl font-bold text-white mb-10 text-center">Cosa dicono i clienti</h2>
+        <h2 class="text-2xl font-bold text-white mb-10 text-center">Cosa dicono di me</h2>
         <div class="space-y-6">
             @foreach ($testimonials as $t)
                 <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800">
@@ -107,7 +93,7 @@
 
 <x-cta-section
     title="Ti va di lavorare insieme?"
-    subtitle="Raccontami la tua idea. Ti preparo un preventivo su misura, senza impegno."
+    subtitle="Raccontami la tua idea, ti preparo un preventivo su misura."
     buttonText="Contattami"
     buttonUrl="{{ route('contatti') }}"
 />

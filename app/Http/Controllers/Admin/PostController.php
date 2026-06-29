@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -26,7 +25,7 @@ class PostController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'image' => 'nullable|image|max:10240',
+            'image' => 'nullable|url|max:1024',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
             'published_at' => 'nullable|date',
@@ -35,10 +34,6 @@ class PostController extends Controller
 
         $data['slug'] = Str::slug($data['title']);
         $data['active'] = $request->boolean('active');
-
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('posts/' . $data['slug'], 'cloudinary');
-        }
 
         Post::create($data);
 
@@ -55,7 +50,7 @@ class PostController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'image' => 'nullable|image|max:10240',
+            'image' => 'nullable|url|max:1024',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
             'published_at' => 'nullable|date',
@@ -65,13 +60,6 @@ class PostController extends Controller
         $data['slug'] = Str::slug($data['title']);
         $data['active'] = $request->boolean('active');
 
-        if ($request->hasFile('image')) {
-            if ($post->image) {
-                Storage::disk('cloudinary')->delete($post->image);
-            }
-            $data['image'] = $request->file('image')->store('posts/' . $data['slug'], 'cloudinary');
-        }
-
         $post->update($data);
 
         return redirect()->route('admin.posts.index')->with('success', 'Articolo aggiornato.');
@@ -79,9 +67,6 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
-        if ($post->image) {
-            Storage::disk('cloudinary')->delete($post->image);
-        }
         $post->delete();
         return redirect()->route('admin.posts.index')->with('success', 'Articolo eliminato.');
     }
